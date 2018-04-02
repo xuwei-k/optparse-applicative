@@ -14,6 +14,9 @@ object ChunkSpec extends Scalaprops {
 
   private[this] implicit val strGen = Gen.alphaNumString
 
+  implicit def chunkGen[A: Gen]: Gen[Chunk[A]] =
+    Gen.from1(Chunk.apply)
+
   def equalDocs(w: Int, d1: Doc, d2: Doc): Boolean =
     Doc.prettyRender(w, d1) == Doc.prettyRender(w, d2)
 

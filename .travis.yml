@@ -3,9 +3,8 @@ sudo: false
 scala:
 - 2.12.4
 - 2.11.12
-- 2.10.7
 script:
-- sbt scalafmt::test sbt:scalafmt::test test:scalafmt::test "++ ${TRAVIS_SCALA_VERSION}!" test
+- sbt scalafmtSbtCheck scalafmtCheck test:scalafmtCheck "++ ${TRAVIS_SCALA_VERSION}!" test example/compile:runAll
 jdk:
 - oraclejdk8
 cache:
@@ -15,3 +14,11 @@ cache:
 before_cache:
 - find $HOME/.ivy2/cache -name "ivydata-*.properties" | xargs rm
 - find $HOME/.ivy2/cache -name "*SNAPSHOT*" | xargs rm -rf
+matrix:
+  include:
+  - scala: SCALA_NATIVE
+    sudo: required
+    before_install:
+    - curl https://raw.githubusercontent.com/scala-native/scala-native/v0.3.7/scripts/travis_setup.sh | bash -
+    script:
+    - sbt scalafmtSbtCheck scalafmtCheck test:scalafmtCheck native/test

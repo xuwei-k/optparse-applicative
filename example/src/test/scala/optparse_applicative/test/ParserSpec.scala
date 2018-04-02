@@ -1,7 +1,7 @@
 package optparse_applicative.test
 
 import optparse_applicative._
-import optparse_applicative.test.example.Commands
+import example.Commands
 import optparse_applicative.types.{Failure, ParserInfo, ParserResult, Success}
 
 import scalaprops._

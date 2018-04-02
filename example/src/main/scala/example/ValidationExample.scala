@@ -1,4 +1,4 @@
-package optparse_applicative.test.example
+package example
 
 import optparse_applicative._
 import scalaz.{Applicative, Failure, Success, Validation, ValidationNel}

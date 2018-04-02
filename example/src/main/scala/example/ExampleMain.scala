@@ -1,4 +1,4 @@
-package optparse_applicative.test.example
+package example
 
 import java.io.File
 
