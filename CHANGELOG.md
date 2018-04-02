@@ -1,3 +1,10 @@
+### Version 0.8.0 (2 April 2018)
+* fork from https://github.com/bmjames/scala-optparse-applicative. change maven gropuId, artifactId and package names
+* support scala-js and scala-native
+* support Scala 2.13.0-M3
+* update dependencies
+* drop Scala 2.10 support
+
 ### Version 0.7 (15 April 2017)
 * Linear bounded pretty printer implementation (Colt Frederickson)
 
