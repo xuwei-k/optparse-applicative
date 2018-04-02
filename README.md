@@ -13,8 +13,6 @@ This library depends on [Scalaz][2] for functional data structures, type classes
 How to get it
 -------------
 
-optparse-applicative is available for Scala 2.10, 2.11 and 2.12.
-
 for jvm
 
 ```scala
