@@ -1,8 +1,8 @@
 version := "0.7"
 
-organization := "net.bmjames"
+organization := "com.github.xuwei-k"
 
-name := "scala-optparse-applicative"
+name := "optparse-applicative"
 
 scalaVersion := "2.11.12"
 
