@@ -167,7 +167,7 @@ object Doc {
           done(
             (remain: Remaining) =>
               for {
-                cont1 <- f(width - remain)(indent, width)(cont)
+                cont1 <- f(width - remain)((indent, width))(cont)
                 out <- cont1(position, dq)
                 bp <- out(remain)
               } yield bp
