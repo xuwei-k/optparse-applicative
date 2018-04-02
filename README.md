@@ -14,9 +14,19 @@ How to get it
 
 optparse-applicative is available for Scala 2.10, 2.11 and 2.12.
 
-```
+for jvm
+
+```scala
 libraryDependencies += "com.github.xuwei-k" %% "optparse-applicative" % "0.8.0"
 ```
+
+
+for scala-js, scala-native
+
+```scala
+libraryDependencies += "com.github.xuwei-k" %%% "optparse-applicative" % "0.8.0"
+```
+
 
 License
 -------
@@ -66,15 +76,6 @@ When run with the `--help` option, it prints:
       --quiet                  Whether to be quiet
 
 
-Advanced examples
------------------
-
-Further examples can be found in `src/test/examples`.
-
-To Do
------
-
-  * More tests
 
 [1]: https://hackage.haskell.org/package/optparse-applicative
 [2]: https://github.com/scalaz/scalaz
