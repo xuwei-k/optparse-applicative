@@ -1,5 +1,3 @@
-version := "0.7"
-
 organization := "com.github.xuwei-k"
 
 name := "optparse-applicative"
