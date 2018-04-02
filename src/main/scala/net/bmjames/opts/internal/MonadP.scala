@@ -69,7 +69,7 @@ object P {
         P(eitherTHoist[ParseError].liftM(fa.run.run))
 
       def error[A](e: ParseError): P[A] =
-        P(EitherT.left(e.point[ContextWriter]))
+        P(EitherT.leftT(e.point[ContextWriter]))
 
       def exit[A, B](p: Parser[B], a: Option[A]): P[A] =
         P(a.orEmpty[P_])
