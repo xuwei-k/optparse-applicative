@@ -11,6 +11,8 @@ import scalaz.syntax.std.option._
 import scalaz.syntax.monadPlus._
 import scalaz.syntax.foldable._
 
+import scalaprops.Gen
+
 /** The free monoid on a semigroup A */
 final case class Chunk[A](run: Option[A]) {
 
@@ -23,6 +25,9 @@ final case class Chunk[A](run: Option[A]) {
 object Chunk {
 
   def empty[A]: Chunk[A] = Chunk(None)
+
+  implicit def chunkGen[A: Gen]: Gen[Chunk[A]] =
+    Gen.from1(Chunk.apply)
 
   implicit val chunkMonadPlus: MonadPlus[Chunk] =
     new MonadPlus[Chunk] {

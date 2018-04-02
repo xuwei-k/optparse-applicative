@@ -1,3 +1,7 @@
+scalapropsSettings
+
+scalapropsVersion := "0.5.4"
+
 organization := "com.github.xuwei-k"
 
 name := "optparse-applicative"
@@ -15,7 +19,8 @@ scalacOptions ++= List(
   "-language:higherKinds")
 
 libraryDependencies ++= List(
-  "org.scalaz" %% "scalaz-core" % "7.2.20",
-  "org.scalacheck" %% "scalacheck" % "1.13.5" % "test")
+  "com.github.scalaprops" %% "scalaprops-gen" % scalapropsVersion.value,
+  "org.scalaz" %% "scalaz-core" % "7.2.20"
+)
 
 addCompilerPlugin("org.spire-math" % "kind-projector" % "0.9.6" cross CrossVersion.binary)

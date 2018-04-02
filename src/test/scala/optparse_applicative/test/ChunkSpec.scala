@@ -3,49 +3,45 @@ package optparse_applicative.test
 import optparse_applicative.helpdoc.Chunk
 import optparse_applicative.internal._
 import optparse_applicative.types.Doc
-
 import scalaz.std.list._
 import scalaz.std.string._
 import scalaz.syntax.applicative._
-import scalaz.syntax.foldable._
-import org.scalacheck.{Arbitrary, Gen, Properties}
-import org.scalacheck.Prop.forAll
+import scalaprops._
+import scalaprops.Property.forAll
+import scalaz.Foldable
 
-import Arbitrary._, Gen._
+object ChunkSpec extends Scalaprops {
 
-object ChunkSpec extends Properties("Chunk") {
-
-  implicit def arbitraryChunk[A](implicit ev: Arbitrary[Option[A]]): Arbitrary[Chunk[A]] =
-    Arbitrary(ev.arbitrary.map(Chunk(_)))
+  private[this] implicit val strGen = Gen.alphaNumString
 
   def equalDocs(w: Int, d1: Doc, d2: Doc): Boolean =
     Doc.prettyRender(w, d1) == Doc.prettyRender(w, d2)
 
-  property("fromList 1") = forAll { xs: List[String] =>
+  val `fromList 1` = forAll { xs: List[String] =>
     Chunk.fromList(xs).isEmpty == xs.isEmpty
   }
 
-  property("fromList 2") = forAll { xs: List[String] =>
-    Chunk.fromList(xs) == xs.map(_.point[Chunk]).suml
+  val `fromList 2` = forAll { xs: List[String] =>
+    Chunk.fromList(xs) == Foldable[List].suml(xs.map(_.point[Chunk]))
   }
 
-  property("extract 1") = forAll { s: String =>
+  val `extract 1` = forAll { s: String =>
     Chunk.extract(s.point[Chunk]) == s
   }
 
-  property("extract 2") = forAll { x: Chunk[String] =>
+  val `extract 2` = forAll { x: Chunk[String] =>
     Chunk.extract(x.map(_.pure[Chunk])) == x
   }
 
-  property("fromString 1") = forAll(posNum[Int], arbitrary[String]) { (w, s) =>
+  val `fromString 1` = Property.forAllG(Gen.positiveInt, Gen[String]) { (w, s) =>
     equalDocs(w, Chunk.extract(Chunk.fromString(s)), Doc.string(s))
   }
 
-  property("fromString 2") = forAll { s: String =>
+  val `fromString 2` = forAll { s: String =>
     Chunk.fromString(s).isEmpty == s.isEmpty
   }
 
-  property("paragraph") = forAll { s: String =>
+  val `paragraph` = forAll { s: String =>
     Chunk.paragraph(s).isEmpty == words(s).isEmpty
   }
 }

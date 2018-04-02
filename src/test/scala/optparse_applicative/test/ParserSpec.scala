@@ -4,17 +4,18 @@ import optparse_applicative._
 import optparse_applicative.test.example.Commands
 import optparse_applicative.types.{Failure, ParserInfo, ParserResult, Success}
 
-import org.scalacheck.{Prop, Properties}
+import scalaprops._
+import scalaprops.Property.forAll
 import scalaz.syntax.apply._
 
 import example._
 
-class ParserSpec extends Properties("Parser") {
+class ParserSpec extends Scalaprops {
 
   def run[A](pinfo: ParserInfo[A], args: List[String]): ParserResult[A] =
     execParserPure(prefs(), pinfo, args)
 
-  property("dash-dash args") = Prop {
+  val `dash-dash args` = forAll {
     val result = run(Commands.opts, List("hello", "foo", "--", "--bar", "--", "baz"))
     result match {
       case Success(Hello(List("foo", "--bar", "--", "baz"))) => true
@@ -25,12 +26,12 @@ class ParserSpec extends Properties("Parser") {
   val flags: Parser[Int] =
     flag_(1, long("foo")) <|> flag_(2, long("bar")) <|> flag_(3, long("baz"))
 
-  property("disambiguate") = Prop {
+  val `test disambiguate` = forAll {
     val result = execParserPure(prefs(disambiguate), info(flags), List("--f"))
     result == Success(1)
   }
 
-  property("ambiguous") = Prop {
+  val ambiguous = forAll {
     val result = execParserPure(prefs(disambiguate), info(flags), List("--ba"))
     result match {
       case Success(_) => false
@@ -38,7 +39,7 @@ class ParserSpec extends Properties("Parser") {
     }
   }
 
-  property("backtracking") = Prop {
+  val backtracking = forAll {
     val p2 = switch(short('a'))
     val p1 = ^(subparser(command("c", info(p2))), switch(short('b')))((_, _))
     val i = info(p1 <*> helper)
