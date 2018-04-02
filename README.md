@@ -35,7 +35,7 @@ This library is distributed under a [BSD 3-Clause][3] license (see `LICENSE`).
 Simple example
 --------------
 
-This example follows the one from the [optparse-applicative] [1] docs.
+This example follows the one from the [optparse-applicative][1] docs.
 
 ```scala
 case class Sample(hello: String, quiet: Boolean)
