@@ -4,6 +4,7 @@ import sbtcrossproject.{crossProject, CrossType}
 
 val Scala211 = "2.11.12"
 val Scala212 = "2.12.4"
+val Scala213 = "2.13.0-M3"
 
 def gitHash(): String = sys.process.Process("git rev-parse HEAD").lineStream_!.head
 
@@ -77,7 +78,7 @@ val commonSettings = Seq[SettingsDefinition](
     pushChanges
   ),
   scalaVersion := Scala211,
-  crossScalaVersions := List(Scala211, Scala212),
+  crossScalaVersions := List(Scala211, Scala212, Scala213),
   scalacOptions ++= List(
     "-feature",
     "-deprecation",
