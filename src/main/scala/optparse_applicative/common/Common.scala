@@ -12,40 +12,41 @@ private[optparse_applicative] trait Common {
 
   def showOption(name: OptName): String =
     name match {
-      case OptLong(n)  => s"--$n"
+      case OptLong(n) => s"--$n"
       case OptShort(n) => s"-$n"
     }
 
   def argMatches[F[_], A](opt: OptReader[A], arg: String)(implicit F: MonadP[F]): Option[StateT[F, Args, A]] =
     opt match {
       case ArgReader(rdr) =>
-        Some(runReadM(rdr.reader, arg).liftM[StateT[?[_],Args,?]])
+        Some(runReadM(rdr.reader, arg).liftM[StateT[?[_], Args, ?]])
       case CmdReader(_, f) =>
         f(arg).map { subp =>
           StateT[F, Args, A] { args =>
             for {
-              _      <- F.setContext(Some(arg), subp)
-              prefs  <- F.getPrefs
+              _ <- F.setContext(Some(arg), subp)
+              prefs <- F.getPrefs
               runSub <- if (prefs.backtrack)
-                          runParser(getPolicy(subp), subp.parser, args)
-                        else
-                          runParserInfo(subp, args).map(Nil -> _)
+                runParser(getPolicy(subp), subp.parser, args)
+              else
+                runParserInfo(subp, args).map(Nil -> _)
             } yield runSub
           }
         }
       case _ => None
     }
 
-  private def argsMState[F[_]: Monad] = MonadState[StateT[F,Args,?], Args]
+  private def argsMState[F[_]: Monad] = MonadState[StateT[F, Args, ?], Args]
 
-  def optMatches[F[_], A](disambiguate: Boolean, opt: OptReader[A], word: OptWord)(implicit F: MonadP[F]): Option[StateT[F, Args, A]] = {
+  def optMatches[F[_], A](disambiguate: Boolean, opt: OptReader[A], word: OptWord)(
+    implicit F: MonadP[F]): Option[StateT[F, Args, A]] = {
     def hasName(n: OptName, ns: List[OptName]): Boolean =
       if (disambiguate) ns.exists(isOptionPrefix(n, _)) else ns.contains(n)
 
     def errorFor(name: OptName, e: ParseError) =
       e match {
         case ErrorMsg(msg) => F.error(ErrorMsg(s"option ${showOption(name)}: $msg"))
-        case _             => F.error(e)
+        case _ => F.error(e)
       }
 
     val state = argsMState[F]
@@ -54,17 +55,17 @@ private[optparse_applicative] trait Common {
         val read: StateT[F, Args, A] = for {
           args <- state.get
           mbArgs = uncons(word.value.toList ++ args)
-          missingArg: StateT[F, Args, (String, Args)] = F.missingArg(noArgErr).liftM[StateT[?[_],Args,?]]
-          as <- mbArgs.fold(missingArg)(_.point[StateT[F,Args,?]])
+          missingArg: StateT[F, Args, (String, Args)] = F.missingArg(noArgErr).liftM[StateT[?[_], Args, ?]]
+          as <- mbArgs.fold(missingArg)(_.point[StateT[F, Args, ?]])
           (arg1, args1) = as
           _ <- state.put(args1)
-          run <- rdr.reader.run.run(arg1).fold(
-            e => errorFor(word.name, e).liftM[StateT[?[_],Args,?]],
-            r => r.point[StateT[F,Args,?]])
+          run <- rdr.reader.run
+            .run(arg1)
+            .fold(e => errorFor(word.name, e).liftM[StateT[?[_], Args, ?]], r => r.point[StateT[F, Args, ?]])
         } yield run
         Some(read)
       case FlagReader(names, x) if hasName(word.name, names) && word.value.isEmpty =>
-        Some(x.point[StateT[F,Args,?]])
+        Some(x.point[StateT[F, Args, ?]])
       case _ => None
     }
   }
@@ -72,32 +73,30 @@ private[optparse_applicative] trait Common {
   def isArg[A](r: OptReader[A]): Boolean =
     r match {
       case ArgReader(_) => true
-      case _            => false
+      case _ => false
     }
 
   def parseWord(s: String): Option[OptWord] =
     if (s.startsWith("--")) {
       val w = s.drop(2)
       val (opt, arg) = w.span(_ != '=') match {
-        case (_, "")  => (w, None)
+        case (_, "") => (w, None)
         case (w1, w2) => (w1, Some(w2.tail))
       }
       Some(OptWord(OptLong(opt), arg))
-    }
-    else if (s.startsWith("-")) {
+    } else if (s.startsWith("-")) {
       s.drop(1) match {
         case "" => None
-        case w  =>
+        case w =>
           val (a, rest) = w.splitAt(1)
           val arg = Some(rest).filter(_.nonEmpty)
           Some(OptWord(OptShort(a.head), arg))
       }
-    }
-    else None
+    } else None
 
-  def searchParser[F[_]: Monad, A](f: Opt ~> NondetT[F,?], p: Parser[A]): NondetT[F, Parser[A]] =
+  def searchParser[F[_]: Monad, A](f: Opt ~> NondetT[F, ?], p: Parser[A]): NondetT[F, Parser[A]] =
     p match {
-      case NilP(_)   => PlusEmpty[NondetT[F,?]].empty
+      case NilP(_) => PlusEmpty[NondetT[F, ?]].empty
       case OptP(opt) => f(opt).map(_.point[Parser])
       case MultP(p1, p2) =>
         searchParser(f, p1).map(p2 <*> _) ! searchParser(f, p2).map(_ <*> p1)
@@ -106,40 +105,40 @@ private[optparse_applicative] trait Common {
       case bindP @ BindP(p, k) =>
         for {
           p1 <- searchParser(f, p)
-          x  <- evalParser(p1).orEmpty[NondetT[F,?]]
+          x <- evalParser(p1).orEmpty[NondetT[F, ?]]
         } yield k(x)
     }
 
   /** The default value of a Parser. This function returns an error if any of the options don't have a default value
-    */
+   */
   def evalParser[A](p: Parser[A]): Option[A] =
     p match {
-      case NilP(r)       => r
-      case OptP(_)       => None
+      case NilP(r) => r
+      case OptP(_) => None
       case MultP(p1, p2) => evalParser(p2) <*> evalParser(p1)
-      case AltP(p1, p2)  => evalParser(p1) <+> evalParser(p2)
-      case BindP(p, k)   => evalParser(p) >>= k.andThen(evalParser[A])
+      case AltP(p1, p2) => evalParser(p1) <+> evalParser(p2)
+      case BindP(p, k) => evalParser(p) >>= k.andThen(evalParser[A])
     }
 
   /** Map a polymorphic function over all the options of a parser, and collect the results in a list.
-    */
-  def mapParser[A, B](f: OptHelpInfo => (Opt ~> Const[B,?]), p: Parser[A]): List[B] = {
+   */
+  def mapParser[A, B](f: OptHelpInfo => (Opt ~> Const[B, ?]), p: Parser[A]): List[B] = {
     def flatten[AA](t: OptTree[AA]): List[AA] =
       t match {
-        case Leaf(x)      => List(x)
+        case Leaf(x) => List(x)
         case MultNode(xs) => xs.flatMap(flatten)
-        case AltNode(xs)  => xs.flatMap(flatten)
+        case AltNode(xs) => xs.flatMap(flatten)
       }
     flatten(treeMapParser(f, p))
   }
 
   /** Like mapParser, but collect the results in a tree structure.
-    */
-  def treeMapParser[A, B](g: OptHelpInfo => (Opt ~> Const[B,?]), p: Parser[A]): OptTree[B] = {
+   */
+  def treeMapParser[A, B](g: OptHelpInfo => (Opt ~> Const[B, ?]), p: Parser[A]): OptTree[B] = {
     def hasDefault[AA](p: Parser[AA]): Boolean =
       evalParser(p).isDefined
 
-    def go[AA](m: Boolean, d: Boolean, f: OptHelpInfo => (Opt ~> Const[B,?]), p: Parser[AA]): OptTree[B] =
+    def go[AA](m: Boolean, d: Boolean, f: OptHelpInfo => (Opt ~> Const[B, ?]), p: Parser[AA]): OptTree[B] =
       p match {
         case NilP(_) => MultNode(Nil)
         case OptP(opt) if opt.props.visibility > Internal => Leaf(f(OptHelpInfo(m, d))(opt).getConst)
@@ -163,30 +162,32 @@ private[optparse_applicative] trait Common {
 
     def removeAlt[AA](as: OptTree[AA]): List[OptTree[AA]] =
       as match {
-        case AltNode(ts)   => ts
+        case AltNode(ts) => ts
         case MultNode(Nil) => Nil
-        case t             => List(t)
+        case t => List(t)
       }
 
     as match {
       case Leaf(x) => as
-      case MultNode(xs) => xs.flatMap(x => removeMult(simplify(x))) match {
-        case List(x) => x
-        case xs      => MultNode(xs)
-      }
-      case AltNode(xs) => xs.flatMap(x => removeAlt(simplify(x))) match {
-        case Nil     => MultNode(Nil)
-        case List(x) => x
-        case xs      => AltNode(xs)
-      }
+      case MultNode(xs) =>
+        xs.flatMap(x => removeMult(simplify(x))) match {
+          case List(x) => x
+          case xs => MultNode(xs)
+        }
+      case AltNode(xs) =>
+        xs.flatMap(x => removeAlt(simplify(x))) match {
+          case Nil => MultNode(Nil)
+          case List(x) => x
+          case xs => AltNode(xs)
+        }
     }
   }
 
   def isOptionPrefix(n1: OptName, n2: OptName): Boolean =
     (n1, n2) match {
       case (OptShort(x), OptShort(y)) => x == y
-      case (OptLong(x),  OptLong(y))  => y.startsWith(x)
-      case _                          => false
+      case (OptLong(x), OptLong(y)) => y.startsWith(x)
+      case _ => false
     }
 
   /** Create a parser composed of a single operation. */
@@ -197,12 +198,12 @@ private[optparse_applicative] trait Common {
   }
 
   def searchOpt[F[_]: MonadP, A](pprefs: ParserPrefs, w: OptWord, p: Parser[A]): NondetT[ArgsState[F]#G, Parser[A]] = {
-    val f = new (Opt ~> NondetT[ArgsState[F]#G,?]) {
+    val f = new (Opt ~> NondetT[ArgsState[F]#G, ?]) {
       def apply[AA](fa: Opt[AA]): NondetT[ArgsState[F]#G, AA] = {
         val disambiguate = pprefs.disambiguate && fa.props.visibility > Internal
         optMatches(disambiguate, fa.main, w) match {
-          case Some(matcher) => matcher.liftM[NondetT[?[_],?]]
-          case None          => NondetT.empty[ArgsState[F]#G, AA]
+          case Some(matcher) => matcher.liftM[NondetT[?[_], ?]]
+          case None => NondetT.empty[ArgsState[F]#G, AA]
         }
       }
     }
@@ -212,27 +213,30 @@ private[optparse_applicative] trait Common {
   import NondetT._
 
   def searchArg[F[_]: MonadP, A](arg: String, p: Parser[A]): NondetT[ArgsState[F]#G, Parser[A]] = {
-    val f = new (Opt ~> NondetT[ArgsState[F]#G,?]) {
+    val f = new (Opt ~> NondetT[ArgsState[F]#G, ?]) {
       def apply[AA](fa: Opt[AA]): NondetT[ArgsState[F]#G, AA] =
         (if (isArg(fa.main)) cut[ArgsState[F]#G] else NondetT.pure[ArgsState[F]#G, Unit](())).flatMap(
-          p => argMatches[F, AA](fa.main, arg) match {
-            case Some(matcher) => matcher.liftM[NondetT[?[_],?]]
-            case None          => NondetT.empty[ArgsState[F]#G, AA]
+          p =>
+            argMatches[F, AA](fa.main, arg) match {
+              case Some(matcher) => matcher.liftM[NondetT[?[_], ?]]
+              case None => NondetT.empty[ArgsState[F]#G, AA]
           }
         )
     }
     searchParser[ArgsState[F]#G, A](f, p)
   }
 
-  def stepParser[F[_]: MonadP, A](pprefs: ParserPrefs,
-                                  policy: ArgPolicy,
-                                  arg: String,
-                                  p: Parser[A]): NondetT[ArgsState[F]#G, Parser[A]] =
+  def stepParser[F[_]: MonadP, A](
+    pprefs: ParserPrefs,
+    policy: ArgPolicy,
+    arg: String,
+    p: Parser[A]): NondetT[ArgsState[F]#G, Parser[A]] =
     policy match {
-      case SkipOpts => parseWord(arg) match {
-        case Some(w) => searchOpt(pprefs, w, p)
-        case None    => searchArg(arg, p)
-      }
+      case SkipOpts =>
+        parseWord(arg) match {
+          case Some(w) => searchOpt(pprefs, w, p)
+          case None => searchArg(arg, p)
+        }
       case AllowOpts =>
         val p1: NondetT[ArgsState[F]#G, Parser[A]] = searchArg[F, A](arg, p)
         val ev = NondetT.nondetTMonadPlus[ArgsState[F]#G]
@@ -242,13 +246,13 @@ private[optparse_applicative] trait Common {
     }
 
   /** Apply a Parser to a command line, and return a result and leftover arguments.
-    * This function returns an error if any parsing error occurs, or if any options are missing and don't have a default value.
-    */
+   * This function returns an error if any parsing error occurs, or if any options are missing and don't have a default value.
+   */
   def runParser[F[_], A](policy: ArgPolicy, p: Parser[A], args: Args)(implicit F: MonadP[F]): F[(Args, A)] = {
     lazy val result = evalParser(p).map(args -> _)
 
     def doStep(prefs: ParserPrefs, arg: String, argt: Args): F[(Args, Option[Parser[A]])] =
-      disamb[ArgsState[F]#G, Parser[A]](! prefs.disambiguate, stepParser(prefs, policy, arg, p)).run(argt)
+      disamb[ArgsState[F]#G, Parser[A]](!prefs.disambiguate, stepParser(prefs, policy, arg, p)).run(argt)
 
     (policy, args) match {
       case (SkipOpts, "--" :: argt) => runParser(AllowOpts, p, argt)
@@ -256,7 +260,7 @@ private[optparse_applicative] trait Common {
       case (_, arg :: argt) =>
         for {
           prefs <- F.getPrefs
-          s     <- doStep(prefs, arg, argt)
+          s <- doStep(prefs, arg, argt)
           (args1, mp) = s
           run <- mp match {
             case None => result.orEmpty[F] <+> parseError(arg)
@@ -267,8 +271,9 @@ private[optparse_applicative] trait Common {
   }
 
   def parseError[F[_], A](arg: String)(implicit F: MonadP[F]): F[A] = {
-    val msg = if (arg.startsWith("-")) s"Invalid option `$arg'"
-              else s"Invalid argument `$arg'"
+    val msg =
+      if (arg.startsWith("-")) s"Invalid option `$arg'"
+      else s"Invalid argument `$arg'"
     F.error(ErrorMsg(msg))
   }
 

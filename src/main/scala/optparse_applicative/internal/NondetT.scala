@@ -11,7 +11,7 @@ final case class NondetT[F[_], A](run: ListT[BoolState[F]#λ, A]) {
 
   def !(that: NondetT[F, A])(implicit F: Monad[F]): NondetT[F, A] = {
     val run2 = for {
-      s  <- mState[F].get.liftM[ListT].filter(!_)
+      s <- mState[F].get.liftM[ListT].filter(!_)
       a2 <- that.run
     } yield a2
     NondetT(ltmp[F].plus(run, run2))
@@ -30,28 +30,25 @@ private[internal] trait BoolState[F[_]] {
 
 object NondetT {
 
-  def empty[F[_] : Monad, A]: NondetT[F, A] =
+  def empty[F[_]: Monad, A]: NondetT[F, A] =
     NondetT(ltmp[F].empty)
 
-  def pure[F[_] : Monad, A](a: => A): NondetT[F, A] =
+  def pure[F[_]: Monad, A](a: => A): NondetT[F, A] =
     NondetT(ltmp[F].point(a))
 
   def cut[F[_]: Monad]: NondetT[F, Unit] =
     NondetT(mState[F].put(true).liftM[ListT])
 
   def disamb[F[_]: Monad, A](allowAmb: Boolean, xs: NondetT[F, A]): F[Option[A]] =
-    xs.run
-      .take(if (allowAmb) 1 else 2).run
-      .eval(false)
-      .map {
-        case List(x) => Some(x)
-        case _       => None
-      }
+    xs.run.take(if (allowAmb) 1 else 2).run.eval(false).map {
+      case List(x) => Some(x)
+      case _ => None
+    }
 
   protected def ltmp[F[_]: Monad] = listTMonadPlus[BoolState[F]#λ]
-  protected def mState[F[_]: Monad] = MonadState[StateT[F,Boolean,?], Boolean]
+  protected def mState[F[_]: Monad] = MonadState[StateT[F, Boolean, ?], Boolean]
 
-  implicit def nondetTMonadPlus[F[_] : Monad]: MonadPlus[NondetT[F,?]] =
+  implicit def nondetTMonadPlus[F[_]: Monad]: MonadPlus[NondetT[F, ?]] =
     new MonadPlus[NondetT[F, ?]] {
       def bind[A, B](fa: NondetT[F, A])(f: A => NondetT[F, B]): NondetT[F, B] = fa.flatMap(f)
 
@@ -64,7 +61,7 @@ object NondetT {
 
   implicit def nondetTTrans: MonadTrans[NondetT] =
     new MonadTrans[NondetT] {
-      implicit def apply[G[_]: Monad]: Monad[NondetT[G,?]] =
+      implicit def apply[G[_]: Monad]: Monad[NondetT[G, ?]] =
         nondetTMonadPlus[G]
 
       def liftM[G[_]: Monad, A](a: G[A]): NondetT[G, A] =

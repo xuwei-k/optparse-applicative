@@ -1,6 +1,6 @@
 package optparse_applicative.builder.internal
 
-import optparse_applicative.types.{ParserInfo, ParseError, OptName}
+import optparse_applicative.types.{OptName, ParseError, ParserInfo}
 
 final case class OptionFields[A](names: List[OptName], noArgError: ParseError)
 

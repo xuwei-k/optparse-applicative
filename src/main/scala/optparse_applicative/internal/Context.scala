@@ -12,7 +12,7 @@ object Context {
   def contextNames(c: Context): List[String] =
     c match {
       case HasContext(ns, _) => ns
-      case NullContext       => Nil
+      case NullContext => Nil
     }
 
   implicit val contextMonoid: Monoid[Context] =
@@ -23,7 +23,7 @@ object Context {
       def append(f1: Context, f2: => Context): Context =
         f2 match {
           case HasContext(ns, i) => HasContext(contextNames(f1) ++ ns, i)
-          case NullContext       => f1
+          case NullContext => f1
         }
     }
 }

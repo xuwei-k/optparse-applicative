@@ -2,7 +2,7 @@ package optparse_applicative.test
 
 import optparse_applicative._
 import optparse_applicative.test.example.Commands
-import optparse_applicative.types.{ParserResult, Failure, Success, ParserInfo}
+import optparse_applicative.types.{Failure, ParserInfo, ParserResult, Success}
 
 import org.scalacheck.{Prop, Properties}
 import scalaz.syntax.apply._

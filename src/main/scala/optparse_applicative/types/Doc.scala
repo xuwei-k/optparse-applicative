@@ -2,7 +2,7 @@ package optparse_applicative.types
 
 import scalaz._, Scalaz._
 import scala.collection.immutable.Queue
-import Trampoline.{ suspend, done, delay }
+import Trampoline.{delay, done, suspend}
 
 //Doc implementation as laid out in https://www.cs.kent.ac.uk/pubs/2009/2847/content.pdf section 3.3
 //The key is that it's *linear* bounded. Because of scala, we have to use an insane amount of Trampolines
@@ -38,23 +38,23 @@ object Doc {
       (p: Position, dq: Dq) =>
         dq.lastOption match {
           case Some((pos, group)) =>
-
-            val obligation = (pos, (h: Horizontal) => (out1: Out) =>
-              suspend(
-                for {
-                  out2 <- outGroup(h)(out1)
-                  out3 <- group(h)(out2)
-                } yield out3))
+            val obligation = (
+              pos,
+              (h: Horizontal) =>
+                (out1: Out) =>
+                  suspend(for {
+                    out2 <- outGroup(h)(out1)
+                    out3 <- group(h)(out2)
+                  } yield out3))
             //Add the obligation to the end and see if we can prune
             prune(cont)(p + lengthOfText, dq.init :+ obligation)
           case None =>
             //No choice but to print and move forward
-            suspend(
-              for {
-                out1 <- cont(p + lengthOfText, Queue.empty)
-                out2 <- outGroup(false)(out1)
-              } yield out2)
-        }
+            suspend(for {
+              out1 <- cont(p + lengthOfText, Queue.empty)
+              out2 <- outGroup(false)(out1)
+            } yield out2)
+      }
     )
 
   def prune(cont1: TreeCont): TreeCont =
@@ -64,28 +64,25 @@ object Doc {
           dq.headOption match {
             case Some((s, grp)) =>
               if (p > s + r) {
-                suspend(
-                  for {
-                    cont2 <- prune(cont1)(p, dq.tail)
-                    out <- grp(false)(cont2)
-                    layout <- out(r)
-                  } yield layout)
+                suspend(for {
+                  cont2 <- prune(cont1)(p, dq.tail)
+                  out <- grp(false)(cont2)
+                  layout <- out(r)
+                } yield layout)
               } else {
-                suspend(
-                  for {
-                    out <- cont1(p, dq)
-                    layout <- out(r)
-                  } yield layout)
+                suspend(for {
+                  out <- cont1(p, dq)
+                  layout <- out(r)
+                } yield layout)
               }
 
             case None =>
-              suspend(
-                for {
-                  out <- cont1(p, Queue.empty)
-                  layout <- out(r)
-                } yield layout)
-          }
-      )
+              suspend(for {
+                out <- cont1(p, Queue.empty)
+                layout <- out(r)
+              } yield layout)
+        }
+    )
 
   def leave(cont: TreeCont): TreeCont =
     (p: Position, dq: Dq) =>
@@ -93,87 +90,94 @@ object Doc {
         cont(p, Queue.empty)
       } else if (dq.length == 1) {
         val (s1, group1) = dq.last
-        suspend(
-          for {
-            out1 <- cont(p, Queue.empty)
-            out2 <- group1(true)(out1)
-          } yield out2)
+        suspend(for {
+          out1 <- cont(p, Queue.empty)
+          out2 <- group1(true)(out1)
+        } yield out2)
       } else {
         val (s1, group1) = dq.last
         val (s2, group2) = dq.init.last
-        val obligation = (s2, (h: Horizontal) =>
-          (out1: Out) => {
-            val out3 =
-              (r: Remaining) =>
-                suspend(
-                  for {
+        val obligation = (
+          s2,
+          (h: Horizontal) =>
+            (out1: Out) => {
+              val out3 =
+                (r: Remaining) =>
+                  suspend(for {
                     out2 <- group1(p <= s1 + r)(out1)
                     layout <- out2(r)
                   } yield layout)
-            suspend(group2(h)(out3))
+              suspend(group2(h)(out3))
           })
         cont(p, dq.init.init :+ obligation)
-      }
+    }
 
   //Primatives for providing an instance for Doc.
-  def append(d1: Doc, d2: Doc): Doc = new Doc(iw => cont1 =>
-    suspend(
-      for {
-        cont2 <- d2(iw)(cont1)
-        c3 <- d1(iw)(cont2)
-      } yield c3))
+  def append(d1: Doc, d2: Doc): Doc =
+    new Doc(iw =>
+      cont1 =>
+        suspend(for {
+          cont2 <- d2(iw)(cont1)
+          c3 <- d1(iw)(cont2)
+        } yield c3))
 
-  def group(d: Doc): Doc = new Doc(iw => cont1 => {
-    suspend(d(iw)(leave(cont1)).map { cont2 =>
-      (pos: Position, dq: Dq) => {
-        //obligation to write
-        val obligation = (_: Horizontal) => (o: Out) => done(o)
-        cont2(pos, dq :+ ((pos, obligation)))
-      }
+  def group(d: Doc): Doc =
+    new Doc(iw =>
+      cont1 => {
+        suspend(d(iw)(leave(cont1)).map { cont2 => (pos: Position, dq: Dq) =>
+          {
+            //obligation to write
+            val obligation = (_: Horizontal) => (o: Out) => done(o)
+            cont2(pos, dq :+ ((pos, obligation)))
+          }
+        })
     })
-  })
 
   /**
    * Output text on the line if horizontal is true, otherwise `\n` and indent.
    */
-  private def line(text: String): Doc = new Doc({
-    case (i, w) =>
-      val textLength = text.length
-      val outLine =
-        (horizontal: Horizontal) => (o: Out) =>
-          done(
-            (r: Remaining) =>
-              if (horizontal)
-                output(o, r - textLength, text)
-              else
-                output(o, w - i, "\n" + " " * i)
+  private def line(text: String): Doc =
+    new Doc({
+      case (i, w) =>
+        val textLength = text.length
+        val outLine =
+          (horizontal: Horizontal) =>
+            (o: Out) =>
+              done(
+                (r: Remaining) =>
+                  if (horizontal)
+                    output(o, r - textLength, text)
+                  else
+                    output(o, w - i, "\n" + " " * i)
           )
-      scan(textLength, outLine)
-  })
+        scan(textLength, outLine)
+    })
   def nest(j: Indent, d: Doc): Doc = new Doc({ case (i, w) => d((i + j, w)) })
 
-  def text(s: String): Doc = new Doc({ iw =>
-    val stringLength = s.length
-    val outGroupFunc =
-      (_: Horizontal) => (o: Out) =>
-        done((r: Remaining) => output(o, r - stringLength, s))
-    scan(stringLength, outGroupFunc)(_)
-  })
+  def text(s: String): Doc =
+    new Doc({ iw =>
+      val stringLength = s.length
+      val outGroupFunc =
+        (_: Horizontal) => (o: Out) => done((r: Remaining) => output(o, r - stringLength, s))
+      scan(stringLength, outGroupFunc)(_)
+    })
 
-  def column(f: Int => Doc): Doc = new Doc({
-    case (indent, width) => cont =>
-      done(
-        (position: Position, dq: Dq) =>
+  def column(f: Int => Doc): Doc =
+    new Doc({
+      case (indent, width) =>
+        cont =>
           done(
-            (remain: Remaining) =>
-              for {
-                cont1 <- f(width - remain)((indent, width))(cont)
-                out <- cont1(position, dq)
-                bp <- out(remain)
-              } yield bp
+            (position: Position, dq: Dq) =>
+              done(
+                (remain: Remaining) =>
+                  for {
+                    cont1 <- f(width - remain)((indent, width))(cont)
+                    out <- cont1(position, dq)
+                    bp <- out(remain)
+                  } yield bp
+            )
           )
-      )
-  })
+    })
 
   def nesting(f: Int => Doc): Doc = new Doc({ case iw @ (i, _) => f(i)(iw) })
 
@@ -187,14 +191,15 @@ object Doc {
    * Append spaces to d until it's requestedSpaces. If d is already wide enough, increase nesting
    * and add a line break.
    */
-  def fillBreak(requestedWidth: Int, d: Doc): Doc = width(d, { w =>
-    if (w > requestedWidth) {
-      nest(requestedWidth, line)
-    } else {
-      //Insert the right amount of spaces
-      spaces(requestedWidth - w)
-    }
-  })
+  def fillBreak(requestedWidth: Int, d: Doc): Doc =
+    width(d, { w =>
+      if (w > requestedWidth) {
+        nest(requestedWidth, line)
+      } else {
+        //Insert the right amount of spaces
+        spaces(requestedWidth - w)
+      }
+    })
 
   def string(s: String): Doc =
     if (s == "") {
@@ -219,7 +224,6 @@ object Doc {
     case Nil => Empty
     case docs => docs.reduceLeft(f)
   }
-
 
   //Separate the docs by a space.
   def hsep(docs: List[Doc]): Doc = foldDoc(docs.intersperse(space))(append(_, _))

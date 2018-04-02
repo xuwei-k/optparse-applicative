@@ -3,14 +3,13 @@ package optparse_applicative.helpdoc
 import optparse_applicative.internal.words
 import optparse_applicative.types.Doc
 
-import scalaz.{Applicative, Monoid, MonadPlus}
+import scalaz.{Applicative, MonadPlus, Monoid}
 import scalaz.std.list._
 import scalaz.std.option._
 
 import scalaz.syntax.std.option._
 import scalaz.syntax.monadPlus._
 import scalaz.syntax.foldable._
-
 
 /** The free monoid on a semigroup A */
 final case class Chunk[A](run: Option[A]) {
@@ -47,18 +46,17 @@ object Chunk {
     }
 
   /** Given a semigroup structure on A, return a monoid structure on Chunk[A] */
-  def chunked[A](f: (A, A) => A): (Chunk[A], Chunk[A]) => Chunk[A] =
-    {
-      case (Chunk(None), y) => y
-      case (x, Chunk(None)) => x
-      case (Chunk(Some(x)), Chunk(Some(y))) => Chunk(Some(f(x, y)))
-    }
+  def chunked[A](f: (A, A) => A): (Chunk[A], Chunk[A]) => Chunk[A] = {
+    case (Chunk(None), y) => y
+    case (x, Chunk(None)) => x
+    case (Chunk(Some(x)), Chunk(Some(y))) => Chunk(Some(f(x, y)))
+  }
 
   /** Concatenate a list into a Chunk. */
   def fromList[A: Monoid](as: List[A]): Chunk[A] =
     as match {
       case Nil => Monoid[Chunk[A]].zero
-      case as  => as.foldMap().point[Chunk]
+      case as => as.foldMap().point[Chunk]
     }
 
   implicit class DocChunkSyntax(self: Chunk[Doc]) {
@@ -80,13 +78,13 @@ object Chunk {
   def vsepChunks(chunks: List[Chunk[Doc]]): Chunk[Doc] =
     chunks.foldRight(Chunk.empty[Doc])(chunked((x, y) => x.withLine(Doc.Empty).withLine(y)))
 
-  def extract[A : Monoid](chunk: Chunk[A]): A =
+  def extract[A: Monoid](chunk: Chunk[A]): A =
     chunk.run.orZero
 
   def fromString(s: String): Chunk[Doc] =
     s match {
       case "" => Chunk.empty
-      case s  => Applicative[Chunk].pure(Doc.string(s))
+      case s => Applicative[Chunk].pure(Doc.string(s))
     }
 
   def paragraph(s: String): Chunk[Doc] =
@@ -95,10 +93,10 @@ object Chunk {
   def tabulate(table: List[(Doc, Doc)], size: Int = 24): Chunk[Doc] =
     table match {
       case Nil => Chunk.empty
-      case xs  => 
-      Applicative[Chunk].pure(
-        xs.map { case (k,v) => 
-          Doc.indent(2, Doc.fillBreak(size, k).withSpace(v))
+      case xs =>
+        Applicative[Chunk].pure(xs.map {
+          case (k, v) =>
+            Doc.indent(2, Doc.fillBreak(size, k).withSpace(v))
         }.reduce(_.withLine(_)))
     }
 }

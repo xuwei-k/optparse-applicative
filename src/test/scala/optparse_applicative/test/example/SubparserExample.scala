@@ -8,15 +8,17 @@ case class Options(globalOpt: String, globalFlag: Boolean, command: Command)
 
 sealed trait Command
 case class Add(paths: List[String]) extends Command
-case class Commit(message: String)  extends Command
+case class Commit(message: String) extends Command
 
 object SubparserExample {
 
   val parseOpts: Parser[Options] =
-    ^^(strOption(long("globalOpt"), help("Option that applies to all commands")),
-       switch(long("globalFlag"),   help("Switch that applies to all commands")),
-       subparser[Command](command("add",    info(many(strArgument(metavar("PATH"))).map(Add))),
-                          command("commit", info(strArgument(metavar("MESSAGE")).map(Commit))))
+    ^^(
+      strOption(long("globalOpt"), help("Option that applies to all commands")),
+      switch(long("globalFlag"), help("Switch that applies to all commands")),
+      subparser[Command](
+        command("add", info(many(strArgument(metavar("PATH"))).map(Add))),
+        command("commit", info(strArgument(metavar("MESSAGE")).map(Commit))))
     )(Options)
 
   def main(args: Array[String]) {

@@ -13,8 +13,9 @@ object Commands {
   val hello: Parser[Sample] = many(strArgument(metavar("TARGET..."))).map(Hello)
 
   val sample: Parser[Sample] =
-    subparser(command("hello", info(hello, progDesc("Print greeting"))),
-              command("goodbye", info(pure(Goodbye), progDesc("Say goodbye"))))
+    subparser(
+      command("hello", info(hello, progDesc("Print greeting"))),
+      command("goodbye", info(pure(Goodbye), progDesc("Say goodbye"))))
 
   def run: Sample => Unit = {
     case Hello(targets) => println(s"Hello, ${targets.mkString(", ")}!")

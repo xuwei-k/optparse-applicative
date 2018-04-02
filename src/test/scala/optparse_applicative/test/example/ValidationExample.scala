@@ -1,12 +1,12 @@
 package optparse_applicative.test.example
 
 import optparse_applicative._
-import scalaz.{Applicative, Validation, ValidationNel, Success, Failure}
+import scalaz.{Applicative, Failure, Success, Validation, ValidationNel}
 import scalaz.syntax.apply._
 
 /** Demonstrates combining option parsing (which fails fast when it encounters errors)
-  * with error-accumulating validation (using scalaz.Validation).
-  */
+ * with error-accumulating validation (using scalaz.Validation).
+ */
 object ValidationExample {
 
   case class UserData(username: String, email: String)

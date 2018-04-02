@@ -14,7 +14,7 @@ object MatchResult {
       def append(f1: MatchResult, f2: => MatchResult): MatchResult =
         f1 match {
           case Match(_) => f1
-          case NoMatch  => f2
+          case NoMatch => f2
         }
     }
 }

@@ -27,7 +27,7 @@ private[optparse_applicative] trait Builder {
     ReadM.ask.flatMap { arg =>
       arg.toList match {
         case c :: Nil => c.point[ReadM]
-        case _        => ReadM.error(s"cannot parse value `$arg'")
+        case _ => ReadM.error(s"cannot parse value `$arg'")
       }
     }
 
@@ -99,10 +99,10 @@ private[optparse_applicative] trait Builder {
     Mod.field(_.copy(noArgError = e))
 
   /** Specify a metavariable for the argument.
-    *
-    * Metavariables have no effect on the parser, and only serve to specify the symbolic name for
-    * an argument to be displayed in the help text.
-    */
+   *
+   * Metavariables have no effect on the parser, and only serve to specify the symbolic name for
+   * an argument to be displayed in the help text.
+   */
   def metavar[F[_], A](v: String): Mod[F, A] =
     Mod.option(_.copy(metaVar = v))
 
@@ -256,7 +256,8 @@ private[optparse_applicative] trait Builder {
   import Chunk.empty
 
   def info[A](parser: Parser[A], mod: InfoMod[A]*): ParserInfo[A] = {
-    val base = ParserInfo(parser = parser,
+    val base = ParserInfo(
+      parser = parser,
       fullDesc = true,
       progDesc = empty,
       header = empty,
@@ -284,11 +285,8 @@ private[optparse_applicative] trait Builder {
     Endo(_.copy(columns = cols))
 
   def prefs(mod: PrefsMod*): ParserPrefs = {
-    val base = ParserPrefs(multiSuffix = "",
-      disambiguate = false,
-      showHelpOnError = false,
-      backtrack = true,
-      columns = 80)
+    val base =
+      ParserPrefs(multiSuffix = "", disambiguate = false, showHelpOnError = false, backtrack = true, columns = 80)
     mod.toList.suml.run(base)
   }
 

@@ -21,19 +21,31 @@ object ChunkSpec extends Properties("Chunk") {
   def equalDocs(w: Int, d1: Doc, d2: Doc): Boolean =
     Doc.prettyRender(w, d1) == Doc.prettyRender(w, d2)
 
-  property("fromList 1") = forAll { xs: List[String] => Chunk.fromList(xs).isEmpty == xs.isEmpty }
+  property("fromList 1") = forAll { xs: List[String] =>
+    Chunk.fromList(xs).isEmpty == xs.isEmpty
+  }
 
-  property("fromList 2") = forAll { xs: List[String] => Chunk.fromList(xs) == xs.map(_.point[Chunk]).suml }
+  property("fromList 2") = forAll { xs: List[String] =>
+    Chunk.fromList(xs) == xs.map(_.point[Chunk]).suml
+  }
 
-  property("extract 1") = forAll { s: String => Chunk.extract(s.point[Chunk]) == s }
+  property("extract 1") = forAll { s: String =>
+    Chunk.extract(s.point[Chunk]) == s
+  }
 
-  property("extract 2") = forAll { x: Chunk[String] => Chunk.extract(x.map(_.pure[Chunk])) == x }
+  property("extract 2") = forAll { x: Chunk[String] =>
+    Chunk.extract(x.map(_.pure[Chunk])) == x
+  }
 
   property("fromString 1") = forAll(posNum[Int], arbitrary[String]) { (w, s) =>
     equalDocs(w, Chunk.extract(Chunk.fromString(s)), Doc.string(s))
   }
 
-  property("fromString 2") = forAll { s: String => Chunk.fromString(s).isEmpty == s.isEmpty }
+  property("fromString 2") = forAll { s: String =>
+    Chunk.fromString(s).isEmpty == s.isEmpty
+  }
 
-  property("paragraph") = forAll { s: String => Chunk.paragraph(s).isEmpty == words(s).isEmpty }
+  property("paragraph") = forAll { s: String =>
+    Chunk.paragraph(s).isEmpty == words(s).isEmpty
+  }
 }

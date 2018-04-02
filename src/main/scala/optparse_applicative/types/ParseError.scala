@@ -4,9 +4,9 @@ import scalaz.Monoid
 
 sealed trait ParseError
 case class ErrorMsg(msg: String) extends ParseError
-case class InfoMsg(msg: String)  extends ParseError
-case object ShowHelpText         extends ParseError
-case object UnknownError         extends ParseError
+case class InfoMsg(msg: String) extends ParseError
+case object ShowHelpText extends ParseError
+case object UnknownError extends ParseError
 
 object ParseError {
 
@@ -16,7 +16,7 @@ object ParseError {
       def append(f1: ParseError, f2: => ParseError): ParseError =
         f1 match {
           case UnknownError => f2
-          case _            => f1
+          case _ => f1
         }
     }
 

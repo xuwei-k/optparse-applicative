@@ -6,15 +6,16 @@ import scalaz.Functor
 import scalaz.syntax.functor._
 
 /** A single option of a parser.
-  */
+ */
 final case class Opt[A](main: OptReader[A], props: OptProperties)
 
 /** Specification for an individual parser option.
-  */
-final case class OptProperties(visibility: OptVisibility,
-                               help: Chunk[Doc],
-                               metaVar: String,
-                               showDefault: Option[String])
+ */
+final case class OptProperties(
+  visibility: OptVisibility,
+  help: Chunk[Doc],
+  metaVar: String,
+  showDefault: Option[String])
 
 object Opt {
 

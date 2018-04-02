@@ -6,7 +6,7 @@ import scalaz.EitherT.eitherTHoist
 import scalaz.syntax.monadPlus._
 import scalaz.syntax.std.option._
 
-import optparse_applicative.types.{ParseError, ParserPrefs, Parser, ParserInfo}
+import optparse_applicative.types.{ParseError, Parser, ParserInfo, ParserPrefs}
 
 trait Completer
 

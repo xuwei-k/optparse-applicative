@@ -1,11 +1,11 @@
 package optparse_applicative.types
 
-import scalaz.{Kleisli, ReaderT, \/, MonadPlus}
+import scalaz.{\/, Kleisli, MonadPlus, ReaderT}
 import scalaz.syntax.applicativePlus._
 import scalaz.syntax.either._
 
 /** A newtype over the Either monad used by option readers.
-  */
+ */
 final case class ReadM[A](run: ReaderT[ParseError \/ ?, String, A])
 
 object ReadM {
@@ -38,6 +38,6 @@ object ReadM {
 
       def plus[A](a: ReadM[A], b: => ReadM[A]): ReadM[A] =
         mkReadM(s => a.run.run(s) <+> b.run.run(s))
-        //a.run.fold(_ => b, a => a.point[ReadM])
+      //a.run.fold(_ => b, a => a.point[ReadM])
     }
 }

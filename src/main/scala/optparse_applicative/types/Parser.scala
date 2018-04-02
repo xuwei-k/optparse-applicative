@@ -2,24 +2,24 @@ package optparse_applicative.types
 
 import optparse_applicative.common.{mapParser, treeMapParser}
 import optparse_applicative.types.ParserM._
-import scalaz.{NonEmptyList, ~>, Const, ApplicativePlus}
+import scalaz.{~>, ApplicativePlus, Const, NonEmptyList}
 import scalaz.syntax.applicativePlus._
 
 sealed trait Parser[A] {
 
   final def map[B](f: A => B): Parser[B] =
     this match {
-      case NilP(fa)      => NilP(fa map f)
-      case OptP(fa)      => OptP(fa map f)
+      case NilP(fa) => NilP(fa map f)
+      case OptP(fa) => OptP(fa map f)
       case MultP(p1, p2) => MultP(p1 map (_ andThen f), p2)
-      case AltP(p1, p2)  => AltP(p1 map f, p2 map f)
-      case BindP(p, k)   => BindP(p, k andThen (_ map f))
+      case AltP(p1, p2) => AltP(p1 map f, p2 map f)
+      case BindP(p, k) => BindP(p, k andThen (_ map f))
     }
 
-  final def mapPoly[B](f: OptHelpInfo => (Opt ~> Const[B,?])): List[B] =
+  final def mapPoly[B](f: OptHelpInfo => (Opt ~> Const[B, ?])): List[B] =
     mapParser[A, B](f, this)
 
-  final def treeMap[B](g: OptHelpInfo => (Opt ~> Const[B,?])): OptTree[B] =
+  final def treeMap[B](g: OptHelpInfo => (Opt ~> Const[B, ?])): OptTree[B] =
     treeMapParser[A, B](g, this)
 
   /** Alias for <+> */

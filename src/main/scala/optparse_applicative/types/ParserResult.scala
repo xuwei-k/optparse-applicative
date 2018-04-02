@@ -13,7 +13,7 @@ case class Failure[A](failure: ParserFailure[ParserHelp]) extends ParserResult[A
 sealed trait ExitCode {
   final def toInt: Int =
     this match {
-      case ExitSuccess    => 0
+      case ExitSuccess => 0
       case ExitFailure(i) => i
     }
 }

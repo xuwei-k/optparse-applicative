@@ -5,7 +5,7 @@ scala:
 - 2.11.12
 - 2.10.7
 script:
-- sbt "++ ${TRAVIS_SCALA_VERSION}!" test
+- sbt scalafmt::test sbt:scalafmt::test test:scalafmt::test "++ ${TRAVIS_SCALA_VERSION}!" test
 jdk:
 - oraclejdk8
 cache:
