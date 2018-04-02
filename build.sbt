@@ -81,6 +81,7 @@ val commonSettings = Seq[SettingsDefinition](
   crossScalaVersions := List(Scala211, Scala212, Scala213),
   scalacOptions ++= List(
     "-feature",
+    "-Xfuture",
     "-deprecation",
     "-unchecked",
     "-Xlint",

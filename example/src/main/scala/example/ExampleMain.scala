@@ -19,7 +19,7 @@ object ExampleMain {
       optional(strOption(short('f'), long("file"), metavar("FILE")).map(new File(_)))
     )(Opts.apply)
 
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
     val opts = execParser(args, "ExampleMain", info(parseOpts <*> helper, progDesc("An example program.")))
     println(opts)
   }

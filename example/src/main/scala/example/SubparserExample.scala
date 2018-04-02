@@ -21,7 +21,7 @@ object SubparserExample {
         command("commit", info(strArgument(metavar("MESSAGE")).map(Commit))))
     )(Options)
 
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
     val opts = info(parseOpts <*> helper, progDesc("A program with some global opts and command subparsers"))
     println(execParser(args, "SubparserExample", opts))
   }

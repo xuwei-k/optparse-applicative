@@ -24,7 +24,7 @@ object Commands {
 
   val opts: ParserInfo[Sample] = info(sample <*> helper)
 
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
     println(execParser(args, "SubparserExample", opts))
   }
 
