@@ -52,7 +52,7 @@ object SampleMain {
     case _ =>
   }
 
-  def main(args: Array[String]) {
+  def main(args: Array[String]): Unit = {
     val opts = info(sample <*> helper,
       progDesc("Print a greeting for TARGET"),
       header("hello - a test for scala-optparse-applicative"))
