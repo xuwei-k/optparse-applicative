@@ -30,7 +30,7 @@ def runAllIn(config: Configuration): Setting[Task[Unit]] = {
 
 val commonSettings = Seq[SettingsDefinition](
   scalapropsCoreSettings,
-  scalapropsVersion := "0.5.4",
+  scalapropsVersion := "0.5.5",
   organization := "com.github.xuwei-k",
   description := "optparse-applicative is a Scala library for parsing options on the command line, providing a powerful applicative interface for composing these options",
   homepage := Some(url("https://github.com/xuwei-k/optparse-applicative")),
@@ -99,7 +99,7 @@ val commonSettings = Seq[SettingsDefinition](
   },
   libraryDependencies ++= List(
     "com.github.scalaprops" %%% "scalaprops" % scalapropsVersion.value % "test",
-    "org.scalaz" %%% "scalaz-core" % "7.2.20"
+    "org.scalaz" %%% "scalaz-core" % "7.2.23"
   ),
   addCompilerPlugin("org.spire-math" % "kind-projector" % "0.9.6" cross CrossVersion.binary)
 ).flatMap(_.settings)
