@@ -3,7 +3,6 @@ sudo: false
 scala:
 - 2.12.6
 - 2.11.12
-- 2.13.0-M3
 script:
 - sbt scalafmtSbtCheck scalafmtCheck test:scalafmtCheck "++ ${TRAVIS_SCALA_VERSION}!" test example/compile:runAll
 jdk:
@@ -17,6 +16,12 @@ before_cache:
 - find $HOME/.ivy2/cache -name "*SNAPSHOT*" | xargs rm -rf
 matrix:
   include:
+  - scala: 2.13.0-M4
+    before_script:
+    - git clone -b v0.9.6 https://github.com/non/kind-projector.git
+    - cd kind-projector
+    - sbt "++ ${TRAVIS_SCALA_VERSION}!" publishLocal
+    - cd ..
   - scala: SCALA_NATIVE
     sudo: required
     before_install:

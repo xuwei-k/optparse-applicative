@@ -4,7 +4,7 @@ import sbtcrossproject.{crossProject, CrossType}
 
 val Scala211 = "2.11.12"
 val Scala212 = "2.12.6"
-val Scala213 = "2.13.0-M3"
+val Scala213 = "2.13.0-M4"
 
 def gitHash(): String = sys.process.Process("git rev-parse HEAD").lineStream_!.head
 
