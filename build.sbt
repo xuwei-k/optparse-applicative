@@ -99,7 +99,7 @@ val commonSettings = Seq[SettingsDefinition](
   },
   libraryDependencies ++= List(
     "com.github.scalaprops" %%% "scalaprops" % scalapropsVersion.value % "test",
-    "org.scalaz" %%% "scalaz-core" % "7.2.23"
+    "org.scalaz" %%% "scalaz-core" % "7.2.24"
   ),
   addCompilerPlugin("org.spire-math" % "kind-projector" % "0.9.6" cross CrossVersion.binary)
 ).flatMap(_.settings)
