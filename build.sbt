@@ -4,7 +4,7 @@ import sbtcrossproject.{crossProject, CrossType}
 
 val Scala211 = "2.11.12"
 val Scala212 = "2.12.6"
-val Scala213 = "2.13.0-M4"
+val Scala213 = "2.13.0-M5"
 
 def gitHash(): String = sys.process.Process("git rev-parse HEAD").lineStream_!.head
 
@@ -101,7 +101,7 @@ val commonSettings = Seq[SettingsDefinition](
     "com.github.scalaprops" %%% "scalaprops" % scalapropsVersion.value % "test",
     "org.scalaz" %%% "scalaz-core" % "7.2.26"
   ),
-  addCompilerPlugin("org.spire-math" % "kind-projector" % "0.9.7" cross CrossVersion.binary)
+  addCompilerPlugin("org.spire-math" % "kind-projector" % "0.9.8" cross CrossVersion.binary)
 ).flatMap(_.settings)
 
 lazy val optparseApplicative = crossProject(JVMPlatform, JSPlatform, NativePlatform)
