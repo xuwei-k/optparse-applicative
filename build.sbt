@@ -101,7 +101,7 @@ val commonSettings = Seq[SettingsDefinition](
     "com.github.scalaprops" %%% "scalaprops" % scalapropsVersion.value % "test",
     "org.scalaz" %%% "scalaz-core" % "7.2.27"
   ),
-  addCompilerPlugin("org.spire-math" % "kind-projector" % "0.9.8" cross CrossVersion.binary)
+  addCompilerPlugin("org.spire-math" % "kind-projector" % "0.9.9" cross CrossVersion.binary)
 ).flatMap(_.settings)
 
 lazy val optparseApplicative = crossProject(JVMPlatform, JSPlatform, NativePlatform)
