@@ -30,7 +30,7 @@ def runAllIn(config: Configuration): Setting[Task[Unit]] = {
 
 val commonSettings = Seq[SettingsDefinition](
   scalapropsCoreSettings,
-  scalapropsVersion := "0.5.5",
+  scalapropsVersion := "0.6.0",
   organization := "com.github.xuwei-k",
   description := "optparse-applicative is a Scala library for parsing options on the command line, providing a powerful applicative interface for composing these options",
   homepage := Some(url("https://github.com/xuwei-k/optparse-applicative")),
