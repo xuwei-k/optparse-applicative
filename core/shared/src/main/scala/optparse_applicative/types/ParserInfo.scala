@@ -18,7 +18,8 @@ final case class ParserInfo[A](
   header: Chunk[Doc],
   footer: Chunk[Doc],
   failureCode: Int,
-  intersperse: Boolean) {
+  intersperse: Boolean
+) {
 
   def map[B](f: A => B): ParserInfo[B] = copy(parser = parser.map(f))
 }

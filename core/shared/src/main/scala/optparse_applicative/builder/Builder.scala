@@ -263,7 +263,8 @@ private[optparse_applicative] trait Builder {
       header = empty,
       footer = empty,
       failureCode = 1,
-      intersperse = true)
+      intersperse = true
+    )
     mod.toList.suml.run(base)
   }
 

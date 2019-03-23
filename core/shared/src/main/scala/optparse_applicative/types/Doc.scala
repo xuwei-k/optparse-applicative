@@ -45,7 +45,8 @@ object Doc {
                   suspend(for {
                     out2 <- outGroup(h)(out1)
                     out3 <- group(h)(out2)
-                  } yield out3))
+                  } yield out3)
+            )
             //Add the obligation to the end and see if we can prune
             prune(cont)(p + lengthOfText, dq.init :+ obligation)
           case None =>
@@ -54,7 +55,7 @@ object Doc {
               out1 <- cont(p + lengthOfText, Queue.empty)
               out2 <- outGroup(false)(out1)
             } yield out2)
-      }
+        }
     )
 
   def prune(cont1: TreeCont): TreeCont =
@@ -81,8 +82,8 @@ object Doc {
                 out <- cont1(p, Queue.empty)
                 layout <- out(r)
               } yield layout)
-        }
-    )
+          }
+      )
 
   def leave(cont: TreeCont): TreeCont =
     (p: Position, dq: Dq) =>
@@ -108,30 +109,35 @@ object Doc {
                     layout <- out2(r)
                   } yield layout)
               suspend(group2(h)(out3))
-          })
+            }
+        )
         cont(p, dq.init.init :+ obligation)
-    }
+      }
 
   //Primatives for providing an instance for Doc.
   def append(d1: Doc, d2: Doc): Doc =
-    new Doc(iw =>
-      cont1 =>
-        suspend(for {
-          cont2 <- d2(iw)(cont1)
-          c3 <- d1(iw)(cont2)
-        } yield c3))
+    new Doc(
+      iw =>
+        cont1 =>
+          suspend(for {
+            cont2 <- d2(iw)(cont1)
+            c3 <- d1(iw)(cont2)
+          } yield c3)
+    )
 
   def group(d: Doc): Doc =
-    new Doc(iw =>
-      cont1 => {
-        suspend(d(iw)(leave(cont1)).map { cont2 => (pos: Position, dq: Dq) =>
-          {
-            //obligation to write
-            val obligation = (_: Horizontal) => (o: Out) => done(o)
-            cont2(pos, dq :+ ((pos, obligation)))
-          }
-        })
-    })
+    new Doc(
+      iw =>
+        cont1 => {
+          suspend(d(iw)(leave(cont1)).map { cont2 => (pos: Position, dq: Dq) =>
+            {
+              //obligation to write
+              val obligation = (_: Horizontal) => (o: Out) => done(o)
+              cont2(pos, dq :+ ((pos, obligation)))
+            }
+          })
+        }
+    )
 
   /**
    * Output text on the line if horizontal is true, otherwise `\n` and indent.
@@ -149,7 +155,7 @@ object Doc {
                     output(o, r - textLength, text)
                   else
                     output(o, w - i, "\n" + " " * i)
-          )
+              )
         scan(textLength, outLine)
     })
   def nest(j: Indent, d: Doc): Doc = new Doc({ case (i, w) => d((i + j, w)) })
@@ -175,7 +181,7 @@ object Doc {
                     out <- cont1(position, dq)
                     bp <- out(remain)
                   } yield bp
-            )
+              )
           )
     })
 

@@ -48,7 +48,8 @@ private[optparse_applicative] trait Extra {
     pprefs: ParserPrefs,
     pinfo: ParserInfo[A],
     msg: ParseError,
-    ctx: Context): ParserFailure[ParserHelp] =
+    ctx: Context
+  ): ParserFailure[ParserHelp] =
     ParserFailure { progName =>
       val exitCode = msg match {
         case ErrorMsg(_) | UnknownError => ExitFailure(pinfo.failureCode)
@@ -70,7 +71,9 @@ private[optparse_applicative] trait Extra {
                 List(
                   parserUsage(pprefs, i.parser, unwords(progName :: names)).pure[Chunk],
                   i.progDesc.map(Doc.indent(2, _))
-                )))
+                )
+              )
+            )
         }
 
       val error_help: ParserHelp =
@@ -94,11 +97,11 @@ private[optparse_applicative] trait Extra {
         ctx,
         pinfo,
         names =>
-          new (ParserInfo ~>(Const[ParserHelp, ?])) {
+          new (ParserInfo ~> (Const[ParserHelp, ?])) {
             def apply[AA](fa: ParserInfo[AA]): Const[ParserHelp, AA] = Const {
               baseHelp(fa) |+| usage_help(progName, names, fa) |+| error_help
             }
-        }
+          }
       )
 
       (h, exitCode, pprefs.columns)

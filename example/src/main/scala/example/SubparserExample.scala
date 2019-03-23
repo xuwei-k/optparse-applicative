@@ -18,7 +18,8 @@ object SubparserExample {
       switch(long("globalFlag"), help("Switch that applies to all commands")),
       subparser[Command](
         command("add", info(many(strArgument(metavar("PATH"))).map(Add))),
-        command("commit", info(strArgument(metavar("MESSAGE")).map(Commit))))
+        command("commit", info(strArgument(metavar("MESSAGE")).map(Commit)))
+      )
     )(Options)
 
   def main(args: Array[String]): Unit = {

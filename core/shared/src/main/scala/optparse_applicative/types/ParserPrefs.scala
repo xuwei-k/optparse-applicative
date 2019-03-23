@@ -12,4 +12,5 @@ final case class ParserPrefs(
   disambiguate: Boolean = false,
   showHelpOnError: Boolean = false,
   backtrack: Boolean = false,
-  columns: Int = 80)
+  columns: Int = 80
+)

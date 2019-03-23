@@ -12,7 +12,8 @@ final case class ParserHelp(
   header: Chunk[Doc],
   usage: Chunk[Doc],
   body: Chunk[Doc],
-  footer: Chunk[Doc])
+  footer: Chunk[Doc]
+)
 
 object ParserHelp {
 
@@ -34,7 +35,8 @@ object ParserHelp {
           f1.header |+| f2.header,
           f1.usage |+| f2.usage,
           f1.body |+| f2.body,
-          f1.footer |+| f2.footer)
+          f1.footer |+| f2.footer
+        )
     }
 
   def helpText(help: ParserHelp): Doc =

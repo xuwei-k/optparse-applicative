@@ -39,7 +39,8 @@ private[optparse_applicative] trait Common {
   private def argsMState[F[_]: Monad] = MonadState[StateT[F, Args, ?], Args]
 
   def optMatches[F[_], A](disambiguate: Boolean, opt: OptReader[A], word: OptWord)(
-    implicit F: MonadP[F]): Option[StateT[F, Args, A]] = {
+    implicit F: MonadP[F]
+  ): Option[StateT[F, Args, A]] = {
     def hasName(n: OptName, ns: List[OptName]): Boolean =
       if (disambiguate) ns.exists(isOptionPrefix(n, _)) else ns.contains(n)
 
@@ -220,7 +221,7 @@ private[optparse_applicative] trait Common {
             argMatches[F, AA](fa.main, arg) match {
               case Some(matcher) => matcher.liftM[NondetT[?[_], ?]]
               case None => NondetT.empty[ArgsState[F]#G, AA]
-          }
+            }
         )
     }
     searchParser[ArgsState[F]#G, A](f, p)
@@ -230,7 +231,8 @@ private[optparse_applicative] trait Common {
     pprefs: ParserPrefs,
     policy: ArgPolicy,
     arg: String,
-    p: Parser[A]): NondetT[ArgsState[F]#G, Parser[A]] =
+    p: Parser[A]
+  ): NondetT[ArgsState[F]#G, Parser[A]] =
     policy match {
       case SkipOpts =>
         parseWord(arg) match {

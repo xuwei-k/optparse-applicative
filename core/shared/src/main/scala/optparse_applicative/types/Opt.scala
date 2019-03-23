@@ -15,7 +15,8 @@ final case class OptProperties(
   visibility: OptVisibility,
   help: Chunk[Doc],
   metaVar: String,
-  showDefault: Option[String])
+  showDefault: Option[String]
+)
 
 object Opt {
 
