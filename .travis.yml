@@ -5,7 +5,6 @@ scala:
 - 2.11.12
 - 2.13.0-RC1
 script:
-- if [[ "${TRAVIS_SCALA_VERSION}" == "2.13.0-RC1" ]]; then git clone https://github.com/non/kind-projector.git && cd kind-projector && git checkout eae68daafb5fcae1df246ca0d0db128973d89b8b && sbt 'set version := "0.9.9"' '++ 2.13.0-RC1!' publishLocal && cd .. ; fi
 - sbt scalafmtSbtCheck scalafmtCheck test:scalafmtCheck "++ ${TRAVIS_SCALA_VERSION}!" test example/compile:runAll
 jdk:
 - oraclejdk8
