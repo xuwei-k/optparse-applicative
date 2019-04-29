@@ -19,6 +19,7 @@ matrix:
   include:
   - scala: 2.12.8
     jdk: openjdk11
+    dist: xenial
   - scala: SCALA_NATIVE
     sudo: required
     before_install:
