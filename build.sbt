@@ -81,13 +81,20 @@ val commonSettings = Seq[SettingsDefinition](
   crossScalaVersions := List(Scala211, Scala212, Scala213),
   scalacOptions ++= List(
     "-feature",
-    "-Xfuture",
     "-deprecation",
     "-unchecked",
     "-Xlint",
     "-language:existentials",
     "-language:higherKinds"
   ),
+  scalacOptions ++= {
+    CrossVersion.partialVersion(scalaVersion.value) match {
+      case Some((2, v)) if v <= 12 =>
+        Seq("-Xfuture")
+      case _ =>
+        Nil
+    }
+  },
   scalacOptions in (Compile, doc) ++= {
     val tag = tagOrHash.value
     Seq(
