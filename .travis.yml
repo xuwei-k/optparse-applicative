@@ -1,5 +1,6 @@
 language: scala
 sudo: false
+dist: xenial
 scala:
 - 2.12.8
 - 2.11.12
@@ -7,7 +8,7 @@ scala:
 script:
 - sbt scalafmtSbtCheck scalafmtCheck test:scalafmtCheck "++ ${TRAVIS_SCALA_VERSION}!" test example/compile:runAll
 jdk:
-- oraclejdk8
+- openjdk8
 cache:
   directories:
   - "$HOME/.ivy2/cache"
