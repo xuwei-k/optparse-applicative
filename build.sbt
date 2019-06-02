@@ -28,7 +28,7 @@ def runAllIn(config: Configuration): Setting[Task[Unit]] = {
   }
 }
 
-val commonSettings = Seq[SettingsDefinition](
+val commonSettings = Def.settings(
   scalapropsCoreSettings,
   scalapropsVersion := "0.6.0",
   organization := "com.github.xuwei-k",
@@ -109,7 +109,7 @@ val commonSettings = Seq[SettingsDefinition](
     "org.scalaz" %%% "scalaz-core" % "7.2.27"
   ),
   addCompilerPlugin("org.typelevel" % "kind-projector" % "0.10.1" cross CrossVersion.binary)
-).flatMap(_.settings)
+)
 
 lazy val optparseApplicative = crossProject(JVMPlatform, JSPlatform, NativePlatform)
   .in(file("core"))
