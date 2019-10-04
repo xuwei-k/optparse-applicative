@@ -3,8 +3,8 @@ import ReleaseStateTransformations._
 import sbtcrossproject.{crossProject, CrossType}
 
 val Scala211 = "2.11.12"
-val Scala212 = "2.12.8"
-val Scala213 = "2.13.0"
+val Scala212 = "2.12.10"
+val Scala213 = "2.13.1"
 
 def gitHash(): String = sys.process.Process("git rev-parse HEAD").lineStream_!.head
 
@@ -108,7 +108,7 @@ val commonSettings = Def.settings(
     "com.github.scalaprops" %%% "scalaprops" % scalapropsVersion.value % "test",
     "org.scalaz" %%% "scalaz-core" % "7.2.28"
   ),
-  addCompilerPlugin("org.typelevel" % "kind-projector" % "0.10.3" cross CrossVersion.binary)
+  addCompilerPlugin("org.typelevel" % "kind-projector" % "0.11.0" cross CrossVersion.full)
 )
 
 lazy val optparseApplicative = crossProject(JVMPlatform, JSPlatform, NativePlatform)
