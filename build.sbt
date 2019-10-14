@@ -106,7 +106,7 @@ val commonSettings = Def.settings(
   },
   libraryDependencies ++= List(
     "com.github.scalaprops" %%% "scalaprops" % scalapropsVersion.value % "test",
-    "org.scalaz" %%% "scalaz-core" % "7.2.28"
+    "org.scalaz" %%% "scalaz-core" % "7.2.29"
   ),
   addCompilerPlugin("org.typelevel" % "kind-projector" % "0.11.0" cross CrossVersion.full)
 )
