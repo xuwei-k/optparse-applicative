@@ -20,12 +20,10 @@ final case class ParserInfo[A](
   failureCode: Int,
   intersperse: Boolean
 ) {
-
   def map[B](f: A => B): ParserInfo[B] = copy(parser = parser.map(f))
 }
 
 object ParserInfo {
-
   implicit val parserInfoFunctor: Functor[ParserInfo] =
     new Functor[ParserInfo] {
       def map[A, B](fa: ParserInfo[A])(f: A => B): ParserInfo[B] =

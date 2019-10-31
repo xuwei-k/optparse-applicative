@@ -7,7 +7,6 @@ import scalaz.syntax.plus._
 case class DefaultProp[A](default: Option[A], sDef: Option[A => String])
 
 object DefaultProp {
-
   implicit def defaultPropMonoid[A]: Monoid[DefaultProp[A]] =
     new Monoid[DefaultProp[A]] {
       def zero: DefaultProp[A] =

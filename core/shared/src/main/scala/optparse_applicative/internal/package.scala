@@ -5,7 +5,6 @@ import optparse_applicative.types.{ParseError, ParserPrefs, ReadM}
 import scalaz.\/
 
 package object internal {
-
   def runP[A](p: P[A], pprefs: ParserPrefs): (Context, ParseError \/ A) =
     p.run.run.run.run(pprefs)
 
@@ -26,5 +25,4 @@ package object internal {
 
   def runReadM[F[_], A](reader: ReadM[A], s: String)(implicit F: MonadP[F]): F[A] =
     P.hoistEither(reader.run.run(s))
-
 }

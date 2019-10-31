@@ -12,7 +12,6 @@ import scalaz.syntax.applicative._
 import scalaz.syntax.semigroup._
 
 private[optparse_applicative] trait Extra {
-
   /** A hidden "helper" option which always fails */
   def helper[A]: Parser[A => A] =
     abortOption(ShowHelpText, long[OptionFields, A => A]("help") <> short('h') <> help("Show this help text") <> hidden)
@@ -111,5 +110,4 @@ private[optparse_applicative] trait Extra {
     val (h, exit, cols) = failure.run(progName)
     (ParserHelp.renderHelp(cols, h), exit)
   }
-
 }

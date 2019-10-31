@@ -7,7 +7,6 @@ case object NoMatch extends MatchResult
 case class Match(s: Option[String]) extends MatchResult
 
 object MatchResult {
-
   implicit def matchResultMonoid: Monoid[MatchResult] =
     new Monoid[MatchResult] {
       def zero: MatchResult = NoMatch

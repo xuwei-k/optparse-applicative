@@ -12,7 +12,6 @@ import scalaz.syntax.foldable._
 import scalaz.std.list._
 
 private[optparse_applicative] trait Builder {
-
   // Since Scalaz has no Read type class, there is no 'auto' function here.
   // Instead, I've implemented fromTryCatch, so you can use Scala's unsafe conversions such as 'toInt'
 
@@ -294,5 +293,4 @@ private[optparse_applicative] trait Builder {
   /** Trivial option modifier. */
   def idm[M](implicit M: Monoid[M]): M =
     M.zero
-
 }

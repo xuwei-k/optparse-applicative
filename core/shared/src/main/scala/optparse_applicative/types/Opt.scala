@@ -19,13 +19,11 @@ final case class OptProperties(
 )
 
 object Opt {
-
   implicit val optFunctor: Functor[Opt] =
     new Functor[Opt] {
       def map[A, B](fa: Opt[A])(f: A => B): Opt[B] =
         fa.copy(main = fa.main.map(f))
     }
-
 }
 
 sealed trait ArgPolicy

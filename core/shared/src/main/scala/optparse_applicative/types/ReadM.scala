@@ -9,7 +9,6 @@ import scalaz.syntax.either._
 final case class ReadM[A](run: ReaderT[ParseError \/ ?, String, A])
 
 object ReadM {
-
   def mkReadM[A](f: String => ParseError \/ A): ReadM[A] =
     ReadM(Kleisli[ParseError \/ ?, String, A](f))
 

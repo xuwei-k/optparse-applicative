@@ -6,7 +6,6 @@ import scalaz.syntax.applicative._
 import CReader._
 
 sealed trait OptReader[A] {
-
   final def names: List[OptName] =
     this match {
       case OptionReader(ns, _, _) => ns
@@ -24,7 +23,6 @@ case class ArgReader[A](cr: CReader[A]) extends OptReader[A]
 case class CmdReader[A](ns: List[String], f: String => Option[ParserInfo[A]]) extends OptReader[A]
 
 object OptReader {
-
   implicit val optReaderFunctor: Functor[OptReader] =
     new Functor[OptReader] {
       def map[A, B](fa: OptReader[A])(f: A => B): OptReader[B] =
@@ -35,7 +33,6 @@ object OptReader {
           case CmdReader(ns, g) => CmdReader(ns, g.andThen(_.map(_.map(f))))
         }
     }
-
 }
 
 sealed trait OptName
@@ -50,5 +47,4 @@ object OptName {
       case (OptShort(_), _) => true
       case (OptLong(_), _) => false
     }
-
 }

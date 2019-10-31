@@ -9,7 +9,6 @@ import scalaz.syntax.std.option._
 import scalaz.syntax.monadPlus._
 
 private[optparse_applicative] trait Common {
-
   def showOption(name: OptName): String =
     name match {
       case OptLong(n) => s"--$n"
@@ -287,5 +286,4 @@ private[optparse_applicative] trait Common {
 
   def runParserFully[F[_]: MonadP, A](policy: ArgPolicy, p: Parser[A], args: Args): F[A] =
     for ((Nil, r) <- runParser(policy, p, args)) yield r
-
 }

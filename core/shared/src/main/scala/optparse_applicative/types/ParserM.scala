@@ -9,7 +9,6 @@ trait ParserM[R] {
 }
 
 object ParserM {
-
   def fromM[A](p: ParserM[A]): Parser[A] =
     p.run(_.pure[Parser])
 
@@ -44,5 +43,4 @@ object ParserM {
           def run[X](f: A => Parser[X]): Parser[X] = f(a)
         }
     }
-
 }

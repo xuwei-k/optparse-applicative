@@ -8,7 +8,6 @@ import scalaz.NonEmptyList
 import scalaz.syntax.applicativePlus._
 
 object ExampleMain {
-
   case class Opts(verbose: Boolean, name: String, inputs: NonEmptyList[File], output: Option[File])
 
   val parseOpts: Parser[Opts] =
@@ -23,5 +22,4 @@ object ExampleMain {
     val opts = execParser(args, "ExampleMain", info(parseOpts <*> helper, progDesc("An example program.")))
     println(opts)
   }
-
 }

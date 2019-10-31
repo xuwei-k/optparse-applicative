@@ -9,7 +9,6 @@ case object ShowHelpText extends ParseError
 case object UnknownError extends ParseError
 
 object ParseError {
-
   implicit val parseErrorMonoid: Monoid[ParseError] =
     new Monoid[ParseError] {
       def zero: ParseError = UnknownError
@@ -19,5 +18,4 @@ object ParseError {
           case _ => f1
         }
     }
-
 }

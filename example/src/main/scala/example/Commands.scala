@@ -9,7 +9,6 @@ case class Hello(targets: List[String]) extends Sample
 case object Goodbye extends Sample
 
 object Commands {
-
   val hello: Parser[Sample] = many(strArgument(metavar("TARGET..."))).map(Hello)
 
   val sample: Parser[Sample] =
@@ -28,5 +27,4 @@ object Commands {
   def main(args: Array[String]): Unit = {
     println(execParser(args, "SubparserExample", opts))
   }
-
 }

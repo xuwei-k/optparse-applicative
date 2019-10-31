@@ -13,7 +13,6 @@ import scalaz.syntax.foldable._
 
 /** The free monoid on a semigroup A */
 final case class Chunk[A](run: Option[A]) {
-
   def isEmpty: Boolean = run.isEmpty
 
   def <>(that: => Chunk[A])(implicit A: Monoid[A]): Chunk[A] =
@@ -21,7 +20,6 @@ final case class Chunk[A](run: Option[A]) {
 }
 
 object Chunk {
-
   def empty[A]: Chunk[A] = Chunk(None)
 
   implicit val chunkMonadPlus: MonadPlus[Chunk] =
@@ -60,7 +58,6 @@ object Chunk {
     }
 
   implicit class DocChunkSyntax(self: Chunk[Doc]) {
-
     /** Concatenate two Chunks with a space in between. */
     def <<+>>(that: Chunk[Doc]): Chunk[Doc] =
       chunked[Doc](_.withSpace(_))(self, that)
