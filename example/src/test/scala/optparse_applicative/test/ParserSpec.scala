@@ -11,7 +11,6 @@ import scalaz.syntax.apply._
 import example._
 
 class ParserSpec extends Scalaprops {
-
   def run[A](pinfo: ParserInfo[A], args: List[String]): ParserResult[A] =
     execParserPure(prefs(), pinfo, args)
 
@@ -49,5 +48,4 @@ class ParserSpec extends Scalaprops {
       case Failure(_) => true
     }
   }
-
 }

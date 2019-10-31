@@ -8,13 +8,11 @@ import scalaz.syntax.semigroup._
 /** An option modifier.
  */
 case class Mod[F[_], A](f: F[A] => F[A], prop: DefaultProp[A], g: OptProperties => OptProperties) {
-
   def <>(that: Mod[F, A]): Mod[F, A] =
     this |+| that
 }
 
 object Mod {
-
   def option[F[_], A](f: OptProperties => OptProperties): Mod[F, A] =
     Mod(identity, Monoid[DefaultProp[A]].zero, f)
 

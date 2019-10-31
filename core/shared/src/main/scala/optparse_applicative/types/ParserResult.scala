@@ -23,7 +23,6 @@ case class ExitFailure(code: Int) extends ExitCode
 case class ParserFailure[H](run: String => (H, ExitCode, Int))
 
 object ParserFailure {
-
   implicit val parserFailureFunctor: Functor[ParserFailure] =
     new Functor[ParserFailure] {
       def map[A, B](fa: ParserFailure[A])(f: A => B): ParserFailure[B] =
@@ -32,5 +31,4 @@ object ParserFailure {
           (f(h), exit, cols)
         }
     }
-
 }

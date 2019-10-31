@@ -9,7 +9,6 @@ import scalaz.syntax.std.option._
 import scalaz.std.option._
 
 package object internal {
-
   def mkCommand[A](mod: Mod[CommandFields, A]): (List[String], String => Option[ParserInfo[A]]) = {
     val CommandFields(cmds) = mod.f(CommandFields(Nil))
     (cmds.map(_._1), cmds.toMap.lift)
@@ -30,5 +29,4 @@ package object internal {
   /** Hide this option from the help text */
   def internal[F[_], A]: Mod[F, A] =
     Mod.option(_.copy(visibility = Internal))
-
 }

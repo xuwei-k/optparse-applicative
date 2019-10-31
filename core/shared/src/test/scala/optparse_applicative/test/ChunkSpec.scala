@@ -11,7 +11,6 @@ import scalaprops.Property.forAll
 import scalaz.Foldable
 
 object ChunkSpec extends Scalaprops {
-
   private[this] implicit val strGen = Gen.alphaNumString
 
   implicit def chunkGen[A: Gen]: Gen[Chunk[A]] =

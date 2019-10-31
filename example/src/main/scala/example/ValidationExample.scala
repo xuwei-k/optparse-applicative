@@ -8,7 +8,6 @@ import scalaz.syntax.apply._
  * with error-accumulating validation (using scalaz.Validation).
  */
 object ValidationExample {
-
   case class UserData(username: String, email: String)
 
   type V[A] = ValidationNel[String, A]

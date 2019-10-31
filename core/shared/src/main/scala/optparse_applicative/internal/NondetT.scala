@@ -6,7 +6,6 @@ import scalaz.syntax.monad._
 import ListT.listTMonadPlus
 
 final case class NondetT[F[_], A](run: ListT[BoolState[F]#λ, A]) {
-
   import NondetT._
 
   def !(that: NondetT[F, A])(implicit F: Monad[F]): NondetT[F, A] = {
@@ -29,7 +28,6 @@ private[internal] trait BoolState[F[_]] {
 }
 
 object NondetT {
-
   def empty[F[_]: Monad, A]: NondetT[F, A] =
     NondetT(ltmp[F].empty)
 

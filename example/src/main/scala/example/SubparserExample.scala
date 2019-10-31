@@ -11,7 +11,6 @@ case class Add(paths: List[String]) extends Command
 case class Commit(message: String) extends Command
 
 object SubparserExample {
-
   val parseOpts: Parser[Options] =
     ^^(
       strOption(long("globalOpt"), help("Option that applies to all commands")),
@@ -26,7 +25,6 @@ object SubparserExample {
     val opts = info(parseOpts <*> helper, progDesc("A program with some global opts and command subparsers"))
     println(execParser(args, "SubparserExample", opts))
   }
-
 }
 
 /* Notes:

@@ -6,7 +6,6 @@ import scalaz.{~>, ApplicativePlus, Const, NonEmptyList}
 import scalaz.syntax.applicativePlus._
 
 sealed trait Parser[A] {
-
   final def map[B](f: A => B): Parser[B] =
     this match {
       case NilP(fa) => NilP(fa map f)
@@ -39,7 +38,6 @@ case class BindP[A, B](p: Parser[A], f: A => Parser[B]) extends Parser[B]
 object Parser extends ParserInstances with ParserFunctions
 
 private[optparse_applicative] trait ParserInstances {
-
   implicit val parserApplicativePlus: ApplicativePlus[Parser] =
     new ApplicativePlus[Parser] {
       override def map[A, B](fa: Parser[A])(f: A => B): Parser[B] =
@@ -59,12 +57,10 @@ private[optparse_applicative] trait ParserInstances {
 
       override def some[A](a: Parser[A]): Parser[List[A]] =
         fromM(^(oneM(a), manyM(a))(_ :: _))
-
     }
 }
 
 private[optparse_applicative] trait ParserFunctions {
-
   def pure[A](a: A): Parser[A] =
     NilP(Some(a))
 

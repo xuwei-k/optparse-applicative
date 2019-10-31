@@ -4,7 +4,6 @@ import sbtrelease.Git
 import scala.sys.process.Process
 
 object UpdateReadme {
-
   val optparseApplicativeName = "optparse-applicative"
   val modules = optparseApplicativeName :: Nil
 

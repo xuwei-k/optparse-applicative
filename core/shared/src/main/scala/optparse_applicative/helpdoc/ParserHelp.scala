@@ -16,7 +16,6 @@ final case class ParserHelp(
 )
 
 object ParserHelp {
-
   val empty: ParserHelp =
     ParserHelp(Chunk.empty, Chunk.empty, Chunk.empty, Chunk.empty, Chunk.empty)
 
@@ -44,5 +43,4 @@ object ParserHelp {
 
   /** Convert a help text to a String */
   def renderHelp(cols: Int, help: ParserHelp): String = helpText(help).pretty(cols)
-
 }

@@ -11,7 +11,6 @@ import scalaz.syntax.functor._
 import scalaz.syntax.monoid._
 
 private[optparse_applicative] trait Help {
-
   import Chunk._
 
   /** Generate description for a single option. */
@@ -135,5 +134,4 @@ private[optparse_applicative] trait Help {
   /** Generate option summary. */
   def parserUsage[A](pprefs: ParserPrefs, parser: Parser[A], progName: String): Doc =
     Doc.hsep(List(Doc.string("Usage:"), Doc.string(progName), extract(briefDesc(pprefs, parser)).align))
-
 }

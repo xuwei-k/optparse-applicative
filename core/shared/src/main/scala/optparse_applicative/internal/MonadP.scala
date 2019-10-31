@@ -26,7 +26,6 @@ import P._
 final case class P[A](run: P_[A])
 
 object P {
-
   type P_[A] = EitherT[ContextWriter, ParseError, A]
   type ParserPrefsReader[A] = Reader[ParserPrefs, A]
   type ContextWriter[A] = WriterT[ParserPrefsReader, Context, A]
@@ -74,5 +73,4 @@ object P {
       def exit[A, B](p: Parser[B], a: Option[A]): P[A] =
         P(a.orEmpty[P_])
     }
-
 }
