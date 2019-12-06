@@ -215,12 +215,11 @@ private[optparse_applicative] trait Common {
   def searchArg[F[_]: MonadP, A](arg: String, p: Parser[A]): NondetT[ArgsState[F]#G, Parser[A]] = {
     val f = new (Opt ~> NondetT[ArgsState[F]#G, ?]) {
       def apply[AA](fa: Opt[AA]): NondetT[ArgsState[F]#G, AA] =
-        (if (isArg(fa.main)) cut[ArgsState[F]#G] else NondetT.pure[ArgsState[F]#G, Unit](())).flatMap(
-          p =>
-            argMatches[F, AA](fa.main, arg) match {
-              case Some(matcher) => matcher.liftM[NondetT[?[_], ?]]
-              case None => NondetT.empty[ArgsState[F]#G, AA]
-            }
+        (if (isArg(fa.main)) cut[ArgsState[F]#G] else NondetT.pure[ArgsState[F]#G, Unit](())).flatMap(p =>
+          argMatches[F, AA](fa.main, arg) match {
+            case Some(matcher) => matcher.liftM[NondetT[?[_], ?]]
+            case None => NondetT.empty[ArgsState[F]#G, AA]
+          }
         )
     }
     searchParser[ArgsState[F]#G, A](f, p)

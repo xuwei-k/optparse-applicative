@@ -58,6 +58,7 @@ object Chunk {
     }
 
   implicit class DocChunkSyntax(self: Chunk[Doc]) {
+
     /** Concatenate two Chunks with a space in between. */
     def <<+>>(that: Chunk[Doc]): Chunk[Doc] =
       chunked[Doc](_.withSpace(_))(self, that)

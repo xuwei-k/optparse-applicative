@@ -34,55 +34,53 @@ object Doc {
   def output(o: Out, r: Remaining, s: String): Free.Trampoline[String] = suspend(o(r).map(s ++ _))
 
   def scan(lengthOfText: Width, outGroup: OutGroup)(cont: TreeCont): Free.Trampoline[TreeCont] =
-    delay(
-      (p: Position, dq: Dq) =>
-        dq.lastOption match {
-          case Some((pos, group)) =>
-            val obligation = (
-              pos,
-              (h: Horizontal) =>
-                (out1: Out) =>
-                  suspend(for {
-                    out2 <- outGroup(h)(out1)
-                    out3 <- group(h)(out2)
-                  } yield out3)
-            )
-            //Add the obligation to the end and see if we can prune
-            prune(cont)(p + lengthOfText, dq.init :+ obligation)
-          case None =>
-            //No choice but to print and move forward
-            suspend(for {
-              out1 <- cont(p + lengthOfText, Queue.empty)
-              out2 <- outGroup(false)(out1)
-            } yield out2)
-        }
+    delay((p: Position, dq: Dq) =>
+      dq.lastOption match {
+        case Some((pos, group)) =>
+          val obligation = (
+            pos,
+            (h: Horizontal) =>
+              (out1: Out) =>
+                suspend(for {
+                  out2 <- outGroup(h)(out1)
+                  out3 <- group(h)(out2)
+                } yield out3)
+          )
+          //Add the obligation to the end and see if we can prune
+          prune(cont)(p + lengthOfText, dq.init :+ obligation)
+        case None =>
+          //No choice but to print and move forward
+          suspend(for {
+            out1 <- cont(p + lengthOfText, Queue.empty)
+            out2 <- outGroup(false)(out1)
+          } yield out2)
+      }
     )
 
   def prune(cont1: TreeCont): TreeCont =
     (p: Position, dq: Dq) =>
-      done(
-        (r: Remaining) =>
-          dq.headOption match {
-            case Some((s, grp)) =>
-              if (p > s + r) {
-                suspend(for {
-                  cont2 <- prune(cont1)(p, dq.tail)
-                  out <- grp(false)(cont2)
-                  layout <- out(r)
-                } yield layout)
-              } else {
-                suspend(for {
-                  out <- cont1(p, dq)
-                  layout <- out(r)
-                } yield layout)
-              }
-
-            case None =>
+      done((r: Remaining) =>
+        dq.headOption match {
+          case Some((s, grp)) =>
+            if (p > s + r) {
               suspend(for {
-                out <- cont1(p, Queue.empty)
+                cont2 <- prune(cont1)(p, dq.tail)
+                out <- grp(false)(cont2)
                 layout <- out(r)
               } yield layout)
-          }
+            } else {
+              suspend(for {
+                out <- cont1(p, dq)
+                layout <- out(r)
+              } yield layout)
+            }
+
+          case None =>
+            suspend(for {
+              out <- cont1(p, Queue.empty)
+              layout <- out(r)
+            } yield layout)
+        }
       )
 
   def leave(cont: TreeCont): TreeCont =
@@ -149,12 +147,11 @@ object Doc {
         val outLine =
           (horizontal: Horizontal) =>
             (o: Out) =>
-              done(
-                (r: Remaining) =>
-                  if (horizontal)
-                    output(o, r - textLength, text)
-                  else
-                    output(o, w - i, "\n" + " " * i)
+              done((r: Remaining) =>
+                if (horizontal)
+                  output(o, r - textLength, text)
+                else
+                  output(o, w - i, "\n" + " " * i)
               )
         scan(textLength, outLine)
     })
@@ -172,16 +169,14 @@ object Doc {
     new Doc({
       case (indent, width) =>
         cont =>
-          done(
-            (position: Position, dq: Dq) =>
-              done(
-                (remain: Remaining) =>
-                  for {
-                    cont1 <- f(width - remain)((indent, width))(cont)
-                    out <- cont1(position, dq)
-                    bp <- out(remain)
-                  } yield bp
-              )
+          done((position: Position, dq: Dq) =>
+            done((remain: Remaining) =>
+              for {
+                cont1 <- f(width - remain)((indent, width))(cont)
+                out <- cont1(position, dq)
+                bp <- out(remain)
+              } yield bp
+            )
           )
     })
 

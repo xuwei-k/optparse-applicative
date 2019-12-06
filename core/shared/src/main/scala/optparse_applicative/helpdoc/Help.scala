@@ -36,19 +36,18 @@ private[optparse_applicative] trait Help {
   /** Generate descriptions for commands. */
   def cmdDesc[A](p: Parser[A]): Chunk[Doc] =
     Chunk.vcatChunks(
-      p.mapPoly(
-        _ =>
-          new (Opt ~> Const[Chunk[Doc], ?]) {
-            def apply[AA](fa: Opt[AA]): Const[Chunk[Doc], AA] =
-              Const(fa.main match {
-                case CmdReader(cmds, p) =>
-                  Chunk.tabulate(
-                    for (cmd <- cmds.reverse; d <- p(cmd).map(_.progDesc).toList)
-                      yield (Doc.string(cmd), extract(d).align)
-                  )
-                case _ => Chunk.empty
-              })
-          }
+      p.mapPoly(_ =>
+        new (Opt ~> Const[Chunk[Doc], ?]) {
+          def apply[AA](fa: Opt[AA]): Const[Chunk[Doc], AA] =
+            Const(fa.main match {
+              case CmdReader(cmds, p) =>
+                Chunk.tabulate(
+                  for (cmd <- cmds.reverse; d <- p(cmd).map(_.progDesc).toList)
+                    yield (Doc.string(cmd), extract(d).align)
+                )
+              case _ => Chunk.empty
+            })
+        }
       )
     )
 
@@ -71,11 +70,10 @@ private[optparse_applicative] trait Help {
       }
 
     foldTree(
-      parser.treeMap(
-        info =>
-          new (Opt ~> Const[Chunk[Doc], ?]) {
-            def apply[AA](fa: Opt[AA]): Const[Chunk[Doc], AA] = Const(optDesc(pprefs, style, info, fa))
-          }
+      parser.treeMap(info =>
+        new (Opt ~> Const[Chunk[Doc], ?]) {
+          def apply[AA](fa: Opt[AA]): Const[Chunk[Doc], AA] = Const(optDesc(pprefs, style, info, fa))
+        }
       )
     )
   }
@@ -86,16 +84,15 @@ private[optparse_applicative] trait Help {
 
     tabulate(
       parser
-        .mapPoly(
-          info =>
-            new (Opt ~> Const[Option[(Doc, Doc)], ?]) {
-              def apply[AA](fa: Opt[AA]): Const[Option[(Doc, Doc)], AA] = Const {
-                val n = optDesc(pprefs, style, info, fa)
-                val h = fa.props.help
-                val hdef = Chunk(fa.props.showDefault.map(s => (Doc.string("default:") |+| Doc.string(s)).parens))
-                (n.isEmpty || n.isEmpty).prevent[Option]((extract(n), extract(h <<+>> hdef).align))
-              }
+        .mapPoly(info =>
+          new (Opt ~> Const[Option[(Doc, Doc)], ?]) {
+            def apply[AA](fa: Opt[AA]): Const[Option[(Doc, Doc)], AA] = Const {
+              val n = optDesc(pprefs, style, info, fa)
+              val h = fa.props.help
+              val hdef = Chunk(fa.props.showDefault.map(s => (Doc.string("default:") |+| Doc.string(s)).parens))
+              (n.isEmpty || n.isEmpty).prevent[Option]((extract(n), extract(h <<+>> hdef).align))
             }
+          }
         )
         .flatten
     )
