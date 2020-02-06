@@ -51,7 +51,7 @@ val commonSettings = Def.settings(
       <tag>{tagOrHash.value}</tag>
     </scm>
   },
-  publishTo := sonatypePublishTo.value,
+  publishTo := sonatypePublishToBundle.value,
   releaseTagName := tagName.value,
   releaseCrossBuild := true,
   releaseProcess := Seq[ReleaseStep](
@@ -71,9 +71,9 @@ val commonSettings = Def.settings(
       enableCrossBuild = true
     ),
     releaseStepCommandAndRemaining(s"; ++ ${Scala211} ; native/publishSigned"),
+    releaseStepCommandAndRemaining("sonatypeBundleRelease"),
     setNextVersion,
     commitNextVersion,
-    releaseStepCommand("sonatypeReleaseAll"),
     UpdateReadme.updateReadmeProcess,
     pushChanges
   ),
