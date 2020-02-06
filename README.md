@@ -16,14 +16,14 @@ How to get it
 for jvm
 
 ```scala
-libraryDependencies += "com.github.xuwei-k" %% "optparse-applicative" % "0.8.1"
+libraryDependencies += "com.github.xuwei-k" %% "optparse-applicative" % "0.8.2"
 ```
 
 
 for scala-js, scala-native
 
 ```scala
-libraryDependencies += "com.github.xuwei-k" %%% "optparse-applicative" % "0.8.1"
+libraryDependencies += "com.github.xuwei-k" %%% "optparse-applicative" % "0.8.2"
 ```
 
 
