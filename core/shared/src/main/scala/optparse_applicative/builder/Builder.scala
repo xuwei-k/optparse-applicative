@@ -53,9 +53,7 @@ private[optparse_applicative] trait Builder {
 
   /** Turns an unsafe conversion function into a reader by catching non-fatal exceptions. */
   def fromTryCatch[A](f: String => A): ReadM[A] =
-    ReadM.mkReadM { arg =>
-      \/.fromTryCatchNonFatal(f(arg)).leftMap(_ => ErrorMsg(s"cannot parse value `$arg'"))
-    }
+    ReadM.mkReadM { arg => \/.fromTryCatchNonFatal(f(arg)).leftMap(_ => ErrorMsg(s"cannot parse value `$arg'")) }
 
   /** Null Option reader. All arguments will fail validation. */
   def disabled[A]: ReadM[A] =
