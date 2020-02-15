@@ -13,8 +13,7 @@ object DocSpec extends Scalaprops {
     Doc.prettyRender(w, d1) == Doc.prettyRender(w, d2)
 
   val `text append is same as concat of strings` = forAllG(Gen.positiveInt, Gen.alphaNumString, Gen.alphaNumString) {
-    (w, s1, s2) =>
-      equalDocs(w, Doc.string(s1 ++ s2), Doc.append(Doc.string(s1), Doc.string(s2)))
+    (w, s1, s2) => equalDocs(w, Doc.string(s1 ++ s2), Doc.append(Doc.string(s1), Doc.string(s2)))
   }
 
   val `nesting law` = forAllG(Gen.positiveInt, Gen.positiveInt, Gen.positiveInt, Gen[Doc]) { (w, w2, w3, doc) =>
@@ -22,9 +21,7 @@ object DocSpec extends Scalaprops {
     equalDocs(w, Doc.nest(nest1 + nest2, doc), Doc.nest(nest1, Doc.nest(nest2, doc)))
   }
 
-  val `zero nesting is id` = forAllG(Gen.positiveInt, Gen[Doc]) { (w, doc) =>
-    equalDocs(w, Doc.nest(0, doc), doc)
-  }
+  val `zero nesting is id` = forAllG(Gen.positiveInt, Gen[Doc]) { (w, doc) => equalDocs(w, Doc.nest(0, doc), doc) }
 
   val `nesting distributes` = forAllG(Gen.positiveInt, Gen.positiveInt, Gen[Doc], Gen[Doc]) { (w, w2, doc, doc2) =>
     val List(nesting, width) = List(w, w2).sorted

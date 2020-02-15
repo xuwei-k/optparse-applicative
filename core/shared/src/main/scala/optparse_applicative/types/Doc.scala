@@ -114,27 +114,25 @@ object Doc {
 
   //Primatives for providing an instance for Doc.
   def append(d1: Doc, d2: Doc): Doc =
-    new Doc(
-      iw =>
-        cont1 =>
-          suspend(for {
-            cont2 <- d2(iw)(cont1)
-            c3 <- d1(iw)(cont2)
-          } yield c3)
+    new Doc(iw =>
+      cont1 =>
+        suspend(for {
+          cont2 <- d2(iw)(cont1)
+          c3 <- d1(iw)(cont2)
+        } yield c3)
     )
 
   def group(d: Doc): Doc =
-    new Doc(
-      iw =>
-        cont1 => {
-          suspend(d(iw)(leave(cont1)).map { cont2 => (pos: Position, dq: Dq) =>
-            {
-              //obligation to write
-              val obligation = (_: Horizontal) => (o: Out) => done(o)
-              cont2(pos, dq :+ ((pos, obligation)))
-            }
-          })
-        }
+    new Doc(iw =>
+      cont1 => {
+        suspend(d(iw)(leave(cont1)).map { cont2 => (pos: Position, dq: Dq) =>
+          {
+            //obligation to write
+            val obligation = (_: Horizontal) => (o: Out) => done(o)
+            cont2(pos, dq :+ ((pos, obligation)))
+          }
+        })
+      }
     )
 
   /**
