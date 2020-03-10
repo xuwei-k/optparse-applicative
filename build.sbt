@@ -1,6 +1,5 @@
 import sbtrelease._
 import ReleaseStateTransformations._
-import sbtcrossproject.{crossProject, CrossType}
 
 val Scala211 = "2.11.12"
 val Scala212 = "2.12.10"
@@ -70,7 +69,7 @@ val commonSettings = Def.settings(
       },
       enableCrossBuild = true
     ),
-    releaseStepCommandAndRemaining(s"; ++ ${Scala211} ; native/publishSigned"),
+    releaseStepCommandAndRemaining(s"; ++ ${Scala211} ; optparseApplicativeNative/publishSigned"),
     releaseStepCommandAndRemaining("sonatypeBundleRelease"),
     setNextVersion,
     commitNextVersion,
@@ -129,9 +128,9 @@ lazy val optparseApplicative = crossProject(JVMPlatform, JSPlatform, NativePlatf
     }
   )
 
-val jvm = optparseApplicative.jvm.withId("jvm")
-val js = optparseApplicative.js.withId("js")
-val native = optparseApplicative.native.withId("native")
+val jvm = optparseApplicative.jvm
+val js = optparseApplicative.js
+val native = optparseApplicative.native
 
 val noPublish = Seq(
   publish := {},
