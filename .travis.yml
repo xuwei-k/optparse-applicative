@@ -2,7 +2,7 @@ language: scala
 sudo: false
 dist: xenial
 scala:
-- 2.12.10
+- 2.12.11
 - 2.11.12
 - 2.13.1
 script:
@@ -18,7 +18,7 @@ before_cache:
 - find $HOME/.ivy2/cache -name "*SNAPSHOT*" | xargs rm -rf
 matrix:
   include:
-  - scala: 2.12.10
+  - scala: 2.12.11
     jdk: openjdk11
     dist: xenial
   - scala: SCALA_NATIVE

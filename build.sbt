@@ -2,7 +2,7 @@ import sbtrelease._
 import ReleaseStateTransformations._
 
 val Scala211 = "2.11.12"
-val Scala212 = "2.12.10"
+val Scala212 = "2.12.11"
 val Scala213 = "2.13.1"
 
 def gitHash(): String = sys.process.Process("git rev-parse HEAD").lineStream_!.head
