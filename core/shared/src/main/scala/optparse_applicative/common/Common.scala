@@ -25,10 +25,11 @@ private[optparse_applicative] trait Common {
             for {
               _ <- F.setContext(Some(arg), subp)
               prefs <- F.getPrefs
-              runSub <- if (prefs.backtrack)
-                runParser(getPolicy(subp), subp.parser, args)
-              else
-                runParserInfo(subp, args).map(Nil -> _)
+              runSub <-
+                if (prefs.backtrack)
+                  runParser(getPolicy(subp), subp.parser, args)
+                else
+                  runParserInfo(subp, args).map(Nil -> _)
             } yield runSub
           }
         }
@@ -37,8 +38,8 @@ private[optparse_applicative] trait Common {
 
   private def argsMState[F[_]: Monad] = MonadState[StateT[F, Args, ?], Args]
 
-  def optMatches[F[_], A](disambiguate: Boolean, opt: OptReader[A], word: OptWord)(
-    implicit F: MonadP[F]
+  def optMatches[F[_], A](disambiguate: Boolean, opt: OptReader[A], word: OptWord)(implicit
+    F: MonadP[F]
   ): Option[StateT[F, Args, A]] = {
     def hasName(n: OptName, ns: List[OptName]): Boolean =
       if (disambiguate) ns.exists(isOptionPrefix(n, _)) else ns.contains(n)
@@ -59,9 +60,10 @@ private[optparse_applicative] trait Common {
           as <- mbArgs.fold(missingArg)(_.point[StateT[F, Args, ?]])
           (arg1, args1) = as
           _ <- state.put(args1)
-          run <- rdr.reader.run
-            .run(arg1)
-            .fold(e => errorFor(word.name, e).liftM[StateT[?[_], Args, ?]], r => r.point[StateT[F, Args, ?]])
+          run <-
+            rdr.reader.run
+              .run(arg1)
+              .fold(e => errorFor(word.name, e).liftM[StateT[?[_], Args, ?]], r => r.point[StateT[F, Args, ?]])
         } yield run
         Some(read)
       case FlagReader(names, x) if hasName(word.name, names) && word.value.isEmpty =>
