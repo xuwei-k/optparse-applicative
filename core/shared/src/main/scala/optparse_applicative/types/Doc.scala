@@ -191,14 +191,17 @@ object Doc {
    * and add a line break.
    */
   def fillBreak(requestedWidth: Int, d: Doc): Doc =
-    width(d, { w =>
-      if (w > requestedWidth) {
-        nest(requestedWidth, line)
-      } else {
-        //Insert the right amount of spaces
-        spaces(requestedWidth - w)
+    width(
+      d,
+      { w =>
+        if (w > requestedWidth) {
+          nest(requestedWidth, line)
+        } else {
+          //Insert the right amount of spaces
+          spaces(requestedWidth - w)
+        }
       }
-    })
+    )
 
   def string(s: String): Doc =
     if (s == "") {
@@ -219,10 +222,11 @@ object Doc {
   def align(d: Doc): Doc = column(current => nesting(indent => nest(current - indent, d)))
 
   //Fold up the docs using f, empty if it's Nil.
-  def foldDoc(docs: Seq[Doc])(f: (Doc, Doc) => Doc): Doc = docs match {
-    case Nil => Empty
-    case docs => docs.reduceLeft(f)
-  }
+  def foldDoc(docs: Seq[Doc])(f: (Doc, Doc) => Doc): Doc =
+    docs match {
+      case Nil => Empty
+      case docs => docs.reduceLeft(f)
+    }
 
   //Separate the docs by a space.
   def hsep(docs: List[Doc]): Doc = foldDoc(docs.intersperse(space))(append(_, _))
