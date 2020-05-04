@@ -98,9 +98,10 @@ private[optparse_applicative] trait Extra {
         pinfo,
         names =>
           new (ParserInfo ~> (Const[ParserHelp, ?])) {
-            def apply[AA](fa: ParserInfo[AA]): Const[ParserHelp, AA] = Const {
-              baseHelp(fa) |+| usage_help(progName, names, fa) |+| error_help
-            }
+            def apply[AA](fa: ParserInfo[AA]): Const[ParserHelp, AA] =
+              Const {
+                baseHelp(fa) |+| usage_help(progName, names, fa) |+| error_help
+              }
           }
       )
 

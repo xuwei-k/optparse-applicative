@@ -86,12 +86,13 @@ private[optparse_applicative] trait Help {
       parser
         .mapPoly(info =>
           new (Opt ~> Const[Option[(Doc, Doc)], ?]) {
-            def apply[AA](fa: Opt[AA]): Const[Option[(Doc, Doc)], AA] = Const {
-              val n = optDesc(pprefs, style, info, fa)
-              val h = fa.props.help
-              val hdef = Chunk(fa.props.showDefault.map(s => (Doc.string("default:") |+| Doc.string(s)).parens))
-              (n.isEmpty || n.isEmpty).prevent[Option]((extract(n), extract(h <<+>> hdef).align))
-            }
+            def apply[AA](fa: Opt[AA]): Const[Option[(Doc, Doc)], AA] =
+              Const {
+                val n = optDesc(pprefs, style, info, fa)
+                val h = fa.props.help
+                val hdef = Chunk(fa.props.showDefault.map(s => (Doc.string("default:") |+| Doc.string(s)).parens))
+                (n.isEmpty || n.isEmpty).prevent[Option]((extract(n), extract(h <<+>> hdef).align))
+              }
           }
         )
         .flatten
