@@ -37,7 +37,7 @@ private[optparse_applicative] trait Help {
   def cmdDesc[A](p: Parser[A]): Chunk[Doc] =
     Chunk.vcatChunks(
       p.mapPoly(_ =>
-        new (Opt ~> Const[Chunk[Doc], ?]) {
+        new (Opt ~> Const[Chunk[Doc], *]) {
           def apply[AA](fa: Opt[AA]): Const[Chunk[Doc], AA] =
             Const(fa.main match {
               case CmdReader(cmds, p) =>
@@ -71,7 +71,7 @@ private[optparse_applicative] trait Help {
 
     foldTree(
       parser.treeMap(info =>
-        new (Opt ~> Const[Chunk[Doc], ?]) {
+        new (Opt ~> Const[Chunk[Doc], *]) {
           def apply[AA](fa: Opt[AA]): Const[Chunk[Doc], AA] = Const(optDesc(pprefs, style, info, fa))
         }
       )
@@ -85,7 +85,7 @@ private[optparse_applicative] trait Help {
     tabulate(
       parser
         .mapPoly(info =>
-          new (Opt ~> Const[Option[(Doc, Doc)], ?]) {
+          new (Opt ~> Const[Option[(Doc, Doc)], *]) {
             def apply[AA](fa: Opt[AA]): Const[Option[(Doc, Doc)], AA] =
               Const {
                 val n = optDesc(pprefs, style, info, fa)

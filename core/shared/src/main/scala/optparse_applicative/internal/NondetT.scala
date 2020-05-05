@@ -44,10 +44,10 @@ object NondetT {
     }
 
   protected def ltmp[F[_]: Monad] = listTMonadPlus[BoolState[F]#λ]
-  protected def mState[F[_]: Monad] = MonadState[StateT[F, Boolean, ?], Boolean]
+  protected def mState[F[_]: Monad] = MonadState[StateT[F, Boolean, *], Boolean]
 
-  implicit def nondetTMonadPlus[F[_]: Monad]: MonadPlus[NondetT[F, ?]] =
-    new MonadPlus[NondetT[F, ?]] {
+  implicit def nondetTMonadPlus[F[_]: Monad]: MonadPlus[NondetT[F, *]] =
+    new MonadPlus[NondetT[F, *]] {
       def bind[A, B](fa: NondetT[F, A])(f: A => NondetT[F, B]): NondetT[F, B] = fa.flatMap(f)
 
       def point[A](a: => A): NondetT[F, A] = NondetT.pure(a)
@@ -59,7 +59,7 @@ object NondetT {
 
   implicit def nondetTTrans: MonadTrans[NondetT] =
     new MonadTrans[NondetT] {
-      implicit def apply[G[_]: Monad]: Monad[NondetT[G, ?]] =
+      implicit def apply[G[_]: Monad]: Monad[NondetT[G, *]] =
         nondetTMonadPlus[G]
 
       def liftM[G[_]: Monad, A](a: G[A]): NondetT[G, A] =

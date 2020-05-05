@@ -6,15 +6,15 @@ import scalaz.syntax.either._
 
 /** A newtype over the Either monad used by option readers.
  */
-final case class ReadM[A](run: ReaderT[ParseError \/ ?, String, A])
+final case class ReadM[A](run: ReaderT[ParseError \/ *, String, A])
 
 object ReadM {
   def mkReadM[A](f: String => ParseError \/ A): ReadM[A] =
-    ReadM(Kleisli[ParseError \/ ?, String, A](f))
+    ReadM(Kleisli[ParseError \/ *, String, A](f))
 
   /** Return the value being read. */
   def ask: ReadM[String] =
-    ReadM(Kleisli.ask[ParseError \/ ?, String])
+    ReadM(Kleisli.ask[ParseError \/ *, String])
 
   /** Abort option reader by exiting with a ParseError. */
   def abort[A](e: ParseError): ReadM[A] =

@@ -56,7 +56,7 @@ private[optparse_applicative] trait Extra {
         case _ => ExitSuccess
       }
 
-      def withContext[AA, B](ctx: Context, pinfo: ParserInfo[AA], f: List[String] => ParserInfo ~> (Const[B, ?])): B =
+      def withContext[AA, B](ctx: Context, pinfo: ParserInfo[AA], f: List[String] => ParserInfo ~> (Const[B, *])): B =
         ctx match {
           case NullContext => f(Nil)(pinfo).getConst
           case HasContext(n, i) => f(n)(i).getConst
@@ -97,7 +97,7 @@ private[optparse_applicative] trait Extra {
         ctx,
         pinfo,
         names =>
-          new (ParserInfo ~> (Const[ParserHelp, ?])) {
+          new (ParserInfo ~> (Const[ParserHelp, *])) {
             def apply[AA](fa: ParserInfo[AA]): Const[ParserHelp, AA] =
               Const {
                 baseHelp(fa) |+| usage_help(progName, names, fa) |+| error_help
