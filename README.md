@@ -75,6 +75,10 @@ When run with the `--help` option, it prints:
       --quiet                  Whether to be quiet
 
 
+Scalaz 7.2.x
+--------------
+
+<https://github.com/xuwei-k/optparse-applicative/tree/0.8.x>
 
 [1]: https://hackage.haskell.org/package/optparse-applicative
 [2]: https://github.com/scalaz/scalaz
