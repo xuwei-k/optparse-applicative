@@ -21,7 +21,7 @@ object ParserHelp {
 
   implicit val parserHelpShow: Show[ParserHelp] =
     new Show[ParserHelp] {
-      override def shows(f: ParserHelp): String = renderHelp(80, f).shows
+      override def show(f: ParserHelp) = renderHelp(80, f).show
     }
 
   implicit val parserHelpMonoid: Monoid[ParserHelp] =

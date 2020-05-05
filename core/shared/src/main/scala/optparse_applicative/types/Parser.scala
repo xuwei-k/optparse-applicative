@@ -2,15 +2,15 @@ package optparse_applicative.types
 
 import optparse_applicative.common.{mapParser, treeMapParser}
 import optparse_applicative.types.ParserM._
-import scalaz.{~>, ApplicativePlus, Const, NonEmptyList}
+import scalaz.{~>, ApplicativePlus, Const, Functor, NonEmptyList}
 import scalaz.syntax.applicativePlus._
 
 sealed trait Parser[A] {
   final def map[B](f: A => B): Parser[B] =
     this match {
       case NilP(fa) => NilP(fa map f)
-      case OptP(fa) => OptP(fa map f)
-      case MultP(p1, p2) => MultP(p1 map (_ andThen f), p2)
+      case OptP(fa) => OptP(Functor[Opt].map(fa)(f))
+      case m @ MultP() => MultP(m.p1 map (_ andThen f), m.p2)
       case AltP(p1, p2) => AltP(p1 map f, p2 map f)
       case BindP(p, k) => BindP(p, k andThen (_ map f))
     }
@@ -29,7 +29,20 @@ case class NilP[A](fa: Option[A]) extends Parser[A]
 
 case class OptP[A](fa: Opt[A]) extends Parser[A]
 
-case class MultP[A, B](p1: Parser[A => B], p2: Parser[A]) extends Parser[B]
+sealed abstract case class MultP[B] private () extends Parser[B] {
+  type A
+  def p1: Parser[A => B]
+  def p2: Parser[A]
+}
+
+object MultP {
+  def apply[A1, B1](a1: Parser[A1 => B1], a2: Parser[A1]): MultP[B1] { type A = A1 } =
+    new MultP[B1] {
+      type A = A1
+      def p1 = a1
+      def p2 = a2
+    }
+}
 
 case class AltP[A](p1: Parser[A], p2: Parser[A]) extends Parser[A]
 
@@ -52,11 +65,6 @@ private[optparse_applicative] trait ParserInstances {
 
       def plus[A](a: Parser[A], b: => Parser[A]): Parser[A] = AltP(a, b)
 
-      override def many[A](a: Parser[A]): Parser[List[A]] =
-        Parser.many(a)
-
-      override def some[A](a: Parser[A]): Parser[List[A]] =
-        fromM(^(oneM(a), manyM(a))(_ :: _))
     }
 }
 

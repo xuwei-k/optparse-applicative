@@ -1,6 +1,6 @@
 package optparse_applicative.types
 
-import scalaz.{IList, Monad, NonEmptyList}
+import scalaz.{Applicative, IList, Monad, NonEmptyList}
 import scalaz.std.option.{none, some}
 import scalaz.syntax.applicativePlus._
 
@@ -21,7 +21,7 @@ object ParserM {
 
   def manyM[A](p: Parser[A]): ParserM[List[A]] =
     oneM(p.map(some) <+> none[A].pure[Parser]).flatMap {
-      case None => List.empty[A].pure
+      case None => Applicative[ParserM].point(List.empty[A])
       case Some(x) => manyM(p).map(x :: _)
     }
 

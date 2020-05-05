@@ -26,12 +26,12 @@ import P._
 final case class P[A](run: P_[A])
 
 object P {
-  type P_[A] = EitherT[ContextWriter, ParseError, A]
+  type P_[A] = EitherT[ParseError, ContextWriter, A]
   type ParserPrefsReader[A] = Reader[ParserPrefs, A]
-  type ContextWriter[A] = WriterT[ParserPrefsReader, Context, A]
+  type ContextWriter[A] = WriterT[Context, ParserPrefsReader, A]
 
-  def tell[F[_]: Applicative, W](w: W): WriterT[F, W, Unit] =
-    writerT((w, ()).point[F])
+  def tell[F[_]: Applicative, W](w: W): WriterT[W, F, Unit] =
+    writerT(Applicative[F].point((w, ())))
 
   def hoistEither[F[_], A](fa: ParseError \/ A)(implicit F: MonadP[F]): F[A] =
     fa.fold(F.error, a => F.point(a))
@@ -68,7 +68,7 @@ object P {
         P(eitherTHoist[ParseError].liftM(fa.run.run))
 
       def error[A](e: ParseError): P[A] =
-        P(EitherT.leftT(e.point[ContextWriter]))
+        P(EitherT.leftT(Applicative[ContextWriter].point(e)))
 
       def exit[A, B](p: Parser[B], a: Option[A]): P[A] =
         P(a.orEmpty[P_])

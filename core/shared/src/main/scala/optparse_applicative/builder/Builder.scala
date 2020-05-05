@@ -11,6 +11,8 @@ import scalaz.syntax.monadPlus._
 import scalaz.syntax.foldable._
 import scalaz.std.list._
 
+import scala.util.control.NonFatal
+
 private[optparse_applicative] trait Builder {
   // Since Scalaz has no Read type class, there is no 'auto' function here.
   // Instead, I've implemented fromTryCatch, so you can use Scala's unsafe conversions such as 'toInt'
@@ -53,7 +55,10 @@ private[optparse_applicative] trait Builder {
 
   /** Turns an unsafe conversion function into a reader by catching non-fatal exceptions. */
   def fromTryCatch[A](f: String => A): ReadM[A] =
-    ReadM.mkReadM { arg => \/.fromTryCatchNonFatal(f(arg)).leftMap(_ => ErrorMsg(s"cannot parse value `$arg'")) }
+    ReadM.mkReadM { arg =>
+      try { \/-(f(arg)) }
+      catch { case NonFatal(_) => -\/(ErrorMsg(s"cannot parse value `$arg'")) }
+    }
 
   /** Null Option reader. All arguments will fail validation. */
   def disabled[A]: ReadM[A] =
@@ -160,7 +165,7 @@ private[optparse_applicative] trait Builder {
 
   /** Builder for a flag parser. */
   def flag[A](defV: A, actV: A, mod: Mod[FlagFields, A]*): Parser[A] =
-    flag_(actV, mod.toList.suml) <+> defV.pure[Parser]
+    Plus[Parser].plus(flag_(actV, mod.toList.suml), Applicative[Parser].point(defV))
 
   /** Builder for a flag parser without a default value. */
   def flag_[A](actV: A, mod: Mod[FlagFields, A]*): Parser[A] = {

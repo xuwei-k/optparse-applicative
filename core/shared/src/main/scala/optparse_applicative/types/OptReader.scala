@@ -1,7 +1,7 @@
 package optparse_applicative.types
 
 import scalaz.Functor
-import scalaz.syntax.applicative._
+import scalaz.syntax.functor._
 
 import CReader._
 

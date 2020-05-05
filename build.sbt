@@ -89,7 +89,7 @@ val commonSettings = Def.settings(
   scalacOptions ++= {
     CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2, v)) if v <= 12 =>
-        Seq("-Xfuture")
+        Seq("-Xfuture", "-Ypartial-unification")
       case _ =>
         Nil
     }
@@ -105,7 +105,7 @@ val commonSettings = Def.settings(
   },
   libraryDependencies ++= List(
     "com.github.scalaprops" %%% "scalaprops" % scalapropsVersion.value % "test",
-    "org.scalaz" %%% "scalaz-core" % "7.2.30"
+    "org.scalaz" %%% "scalaz-core" % "7.3.0"
   ),
   addCompilerPlugin("org.typelevel" % "kind-projector" % "0.11.0" cross CrossVersion.full)
 )
