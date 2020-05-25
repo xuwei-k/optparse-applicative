@@ -4,7 +4,7 @@ import scalaprops._
 import scalaprops.Property.forAllG
 
 object DocSpec extends Scalaprops {
-  private[this] implicit val stringDocGen = Gen.alphaNumString.map(Doc.string(_))
+  private[this] implicit val stringDocGen: Gen[Doc] = Gen.alphaNumString.map(Doc.string(_))
   val lineOrEmptyDocGen = Gen.elements(Doc.line, Doc.Empty)
   val appendDocGen = Gen.listOfN(10, Gen.frequency((3, stringDocGen), (1, lineOrEmptyDocGen))).map {
     _.reduce(Doc.append(_, _))

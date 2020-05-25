@@ -5,15 +5,15 @@ import scalaz.syntax.either._
 
 /** A newtype over the Either monad used by option readers.
  */
-final case class ReadM[A](run: ReaderT[String, ParseError \/ *, A])
+final case class ReadM[A](run: ReaderT[String, \/[ParseError, *], A])
 
 object ReadM {
   def mkReadM[A](f: String => ParseError \/ A): ReadM[A] =
-    ReadM(Kleisli[ParseError \/ *, String, A](f))
+    ReadM(Kleisli[\/[ParseError, *], String, A](f))
 
   /** Return the value being read. */
   def ask: ReadM[String] =
-    ReadM(Kleisli.ask[ParseError \/ *, String])
+    ReadM(Kleisli.ask[\/[ParseError, *], String])
 
   /** Abort option reader by exiting with a ParseError. */
   def abort[A](e: ParseError): ReadM[A] =
@@ -35,7 +35,7 @@ object ReadM {
         mkReadM(_ => -\/(UnknownError))
 
       def plus[A](a: ReadM[A], b: => ReadM[A]): ReadM[A] =
-        mkReadM(s => Plus[ParseError \/ *].plus(a.run.run(s), b.run.run(s)))
+        mkReadM(s => Plus[\/[ParseError, *]].plus(a.run.run(s), b.run.run(s)))
       //a.run.fold(_ => b, a => a.point[ReadM])
     }
 }

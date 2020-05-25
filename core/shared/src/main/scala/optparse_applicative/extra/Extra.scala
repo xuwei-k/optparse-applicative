@@ -10,6 +10,7 @@ import optparse_applicative.builder.internal.OptionFields
 import scalaz.{-\/, \/-, ~>, Const}
 import scalaz.syntax.applicative._
 import scalaz.syntax.semigroup._
+import scalaz.Endo.endoInstance
 
 private[optparse_applicative] trait Extra {
 

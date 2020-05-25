@@ -18,7 +18,7 @@ private[optparse_applicative] trait Common {
   def argMatches[F[_], A](opt: OptReader[A], arg: String)(implicit F: MonadP[F]): Option[StateT[Args, F, A]] =
     opt match {
       case ArgReader(rdr) =>
-        Some(runReadM(rdr.reader, arg).liftM[StateT[Args, *[_], *]])
+        Some(runReadM(rdr.reader, arg).liftM[({ type l[a[_], b] = StateT[Args, a, b] })#l])
       case CmdReader(_, f) =>
         f(arg).map { subp =>
           StateT[Args, F, A] { args =>
@@ -56,14 +56,18 @@ private[optparse_applicative] trait Common {
         val read: StateT[Args, F, A] = for {
           args <- state.get
           mbArgs = uncons(word.value.toList ++ args)
-          missingArg: StateT[Args, F, (String, Args)] = F.missingArg(noArgErr).liftM[StateT[Args, *[_], *]]
+          missingArg =
+            F.missingArg[(String, List[String])](noArgErr).liftM[({ type l[a[_], b] = StateT[Args, a, b] })#l]
           as <- mbArgs.fold(missingArg)(_.point[StateT[Args, F, *]])
           (arg1, args1) = as
           _ <- state.put(args1)
           run <-
             rdr.reader.run
               .run(arg1)
-              .fold(e => errorFor(word.name, e).liftM[StateT[Args, *[_], *]], r => r.point[StateT[Args, F, *]])
+              .fold(
+                e => errorFor(word.name, e).liftM[({ type l[a[_], b] = StateT[Args, a, b] })#l],
+                r => r.point[StateT[Args, F, *]]
+              )
         } yield run
         Some(read)
       case FlagReader(names, x) if hasName(word.name, names) && word.value.isEmpty =>
@@ -204,7 +208,7 @@ private[optparse_applicative] trait Common {
       def apply[AA](fa: Opt[AA]): NondetT[ArgsState[F]#G, AA] = {
         val disambiguate = pprefs.disambiguate && fa.props.visibility > Internal
         optMatches(disambiguate, fa.main, w) match {
-          case Some(matcher) => matcher.liftM[NondetT[*[_], *]]
+          case Some(matcher) => matcher.liftM[NondetT]
           case None => NondetT.empty[ArgsState[F]#G, AA]
         }
       }
@@ -219,7 +223,7 @@ private[optparse_applicative] trait Common {
       def apply[AA](fa: Opt[AA]): NondetT[ArgsState[F]#G, AA] =
         (if (isArg(fa.main)) cut[ArgsState[F]#G] else NondetT.pure[ArgsState[F]#G, Unit](())).flatMap(p =>
           argMatches[F, AA](fa.main, arg) match {
-            case Some(matcher) => matcher.liftM[NondetT[*[_], *]]
+            case Some(matcher) => matcher.liftM[NondetT]
             case None => NondetT.empty[ArgsState[F]#G, AA]
           }
         )
