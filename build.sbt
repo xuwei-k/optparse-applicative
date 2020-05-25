@@ -36,6 +36,9 @@ val commonSettings = Def.settings(
   licenses := Seq(
     "BSD-3-Clause" -> url(s"https://raw.githubusercontent.com/xuwei-k/optparse-applicative/${tagOrHash.value}/LICENSE")
   ),
+  commands += Command.command("SetDottyNightlyVersion") {
+    s"""++ ${dottyLatestNightlyBuild.get}!""" :: _
+  },
   pomExtra := {
     <developers>
       <developer>
@@ -82,10 +85,19 @@ val commonSettings = Def.settings(
     "-feature",
     "-deprecation",
     "-unchecked",
-    "-Xlint",
-    "-language:existentials",
-    "-language:higherKinds"
+    "-language:existentials,higherKinds,implicitConversions"
   ),
+  scalacOptions ++= {
+    if (isDotty.value) {
+      Seq(
+        "-Ykind-projector"
+      )
+    } else {
+      Seq(
+        "-Xlint"
+      )
+    }
+  },
   scalacOptions ++= {
     CrossVersion.partialVersion(scalaVersion.value) match {
       case Some((2, v)) if v <= 12 =>
@@ -106,8 +118,16 @@ val commonSettings = Def.settings(
   libraryDependencies ++= List(
     "com.github.scalaprops" %%% "scalaprops" % scalapropsVersion.value % "test",
     "org.scalaz" %%% "scalaz-core" % "7.3.1"
-  ),
-  addCompilerPlugin("org.typelevel" % "kind-projector" % "0.11.0" cross CrossVersion.full)
+  ).map(_ withDottyCompat scalaVersion.value),
+  libraryDependencies ++= {
+    if (isDotty.value) {
+      Nil
+    } else {
+      Seq(
+        compilerPlugin("org.typelevel" % "kind-projector" % "0.11.0" cross CrossVersion.full)
+      )
+    }
+  }
 )
 
 lazy val optparseApplicative = crossProject(JVMPlatform, JSPlatform, NativePlatform)

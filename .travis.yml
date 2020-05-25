@@ -27,3 +27,7 @@ matrix:
     - curl https://raw.githubusercontent.com/scala-native/scala-native/v0.3.9/scripts/travis_setup.sh | bash -
     script:
     - sbt scalafmtSbtCheck scalafmtCheck test:scalafmtCheck optparseApplicativeNative/test
+  - name: dotty
+    script: sbt scalafmtSbtCheck scalafmtCheck test:scalafmtCheck SetDottyNightlyVersion optparseApplicativeJVM/test
+  allow_failures:
+    - name: dotty
