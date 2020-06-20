@@ -100,7 +100,8 @@ private[optparse_applicative] trait Builder {
   def noArgError[A](e: ParseError): Mod[OptionFields, A] =
     Mod.field(_.copy(noArgError = e))
 
-  /** Specify a metavariable for the argument.
+  /**
+   * Specify a metavariable for the argument.
    *
    * Metavariables have no effect on the parser, and only serve to specify the symbolic name for
    * an argument to be displayed in the help text.

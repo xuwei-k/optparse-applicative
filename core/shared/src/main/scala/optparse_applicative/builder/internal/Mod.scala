@@ -5,7 +5,8 @@ import optparse_applicative.types.OptProperties
 import scalaz.Monoid
 import scalaz.syntax.semigroup._
 
-/** An option modifier.
+/**
+ * An option modifier.
  */
 case class Mod[F[_], A](f: F[A] => F[A], prop: DefaultProp[A], g: OptProperties => OptProperties) {
   def <>(that: Mod[F, A]): Mod[F, A] =

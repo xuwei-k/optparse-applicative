@@ -4,7 +4,8 @@ import optparse_applicative._
 import scalaz.{Applicative, Failure, Success, Validation, ValidationNel}
 import scalaz.syntax.apply._
 
-/** Demonstrates combining option parsing (which fails fast when it encounters errors)
+/**
+ * Demonstrates combining option parsing (which fails fast when it encounters errors)
  * with error-accumulating validation (using scalaz.Validation).
  */
 object ValidationExample {
