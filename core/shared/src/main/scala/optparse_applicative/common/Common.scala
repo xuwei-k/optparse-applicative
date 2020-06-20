@@ -115,7 +115,8 @@ private[optparse_applicative] trait Common {
         } yield k(x)
     }
 
-  /** The default value of a Parser. This function returns an error if any of the options don't have a default value
+  /**
+   * The default value of a Parser. This function returns an error if any of the options don't have a default value
    */
   def evalParser[A](p: Parser[A]): Option[A] =
     p match {
@@ -126,7 +127,8 @@ private[optparse_applicative] trait Common {
       case BindP(p, k) => evalParser(p) >>= k.andThen(evalParser[A])
     }
 
-  /** Map a polymorphic function over all the options of a parser, and collect the results in a list.
+  /**
+   * Map a polymorphic function over all the options of a parser, and collect the results in a list.
    */
   def mapParser[A, B](f: OptHelpInfo => (Opt ~> Const[B, *]), p: Parser[A]): List[B] = {
     def flatten[AA](t: OptTree[AA]): List[AA] =
@@ -138,7 +140,8 @@ private[optparse_applicative] trait Common {
     flatten(treeMapParser(f, p))
   }
 
-  /** Like mapParser, but collect the results in a tree structure.
+  /**
+   * Like mapParser, but collect the results in a tree structure.
    */
   def treeMapParser[A, B](g: OptHelpInfo => (Opt ~> Const[B, *]), p: Parser[A]): OptTree[B] = {
     def hasDefault[AA](p: Parser[AA]): Boolean =
@@ -251,7 +254,8 @@ private[optparse_applicative] trait Common {
         p1 orElse p2
     }
 
-  /** Apply a Parser to a command line, and return a result and leftover arguments.
+  /**
+   * Apply a Parser to a command line, and return a result and leftover arguments.
    * This function returns an error if any parsing error occurs, or if any options are missing and don't have a default value.
    */
   def runParser[F[_], A](policy: ArgPolicy, p: Parser[A], args: Args)(implicit F: MonadP[F]): F[(Args, A)] = {

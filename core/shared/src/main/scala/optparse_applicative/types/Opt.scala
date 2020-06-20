@@ -5,11 +5,13 @@ import optparse_applicative.helpdoc.Chunk
 import scalaz.Functor
 import scalaz.syntax.functor._
 
-/** A single option of a parser.
+/**
+ * A single option of a parser.
  */
 final case class Opt[A](main: OptReader[A], props: OptProperties)
 
-/** Specification for an individual parser option.
+/**
+ * Specification for an individual parser option.
  */
 final case class OptProperties(
   visibility: OptVisibility,

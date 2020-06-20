@@ -4,7 +4,8 @@ import optparse_applicative.helpdoc.Chunk
 
 import scalaz.Functor
 
-/** A full description for a runnable Parser for a program.
+/**
+ * A full description for a runnable Parser for a program.
  *
  * @param parser the option parser for the program
  * @param fullDesc whether the help text should contain full documentation

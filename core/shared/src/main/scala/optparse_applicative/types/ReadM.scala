@@ -3,7 +3,8 @@ package optparse_applicative.types
 import scalaz.{-\/, \/, Kleisli, MonadPlus, Plus, ReaderT}
 import scalaz.syntax.either._
 
-/** A newtype over the Either monad used by option readers.
+/**
+ * A newtype over the Either monad used by option readers.
  */
 final case class ReadM[A](run: ReaderT[String, \/[ParseError, *], A])
 
