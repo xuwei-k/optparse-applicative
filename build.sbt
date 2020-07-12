@@ -117,7 +117,7 @@ val commonSettings = Def.settings(
   },
   libraryDependencies ++= List(
     "com.github.scalaprops" %%% "scalaprops" % scalapropsVersion.value % "test",
-    "org.scalaz" %%% "scalaz-core" % "7.3.1"
+    "org.scalaz" %%% "scalaz-core" % "7.3.2"
   ).map(_ withDottyCompat scalaVersion.value),
   libraryDependencies ++= {
     if (isDotty.value) {
