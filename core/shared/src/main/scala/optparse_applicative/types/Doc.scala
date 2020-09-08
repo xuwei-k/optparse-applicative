@@ -139,19 +139,18 @@ object Doc {
    * Output text on the line if horizontal is true, otherwise `\n` and indent.
    */
   private def line(text: String): Doc =
-    new Doc({
-      case (i, w) =>
-        val textLength = text.length
-        val outLine =
-          (horizontal: Horizontal) =>
-            (o: Out) =>
-              done((r: Remaining) =>
-                if (horizontal)
-                  output(o, r - textLength, text)
-                else
-                  output(o, w - i, "\n" + " " * i)
-              )
-        scan(textLength, outLine)
+    new Doc({ case (i, w) =>
+      val textLength = text.length
+      val outLine =
+        (horizontal: Horizontal) =>
+          (o: Out) =>
+            done((r: Remaining) =>
+              if (horizontal)
+                output(o, r - textLength, text)
+              else
+                output(o, w - i, "\n" + " " * i)
+            )
+      scan(textLength, outLine)
     })
   def nest(j: Indent, d: Doc): Doc = new Doc({ case (i, w) => d((i + j, w)) })
 
@@ -164,18 +163,17 @@ object Doc {
     })
 
   def column(f: Int => Doc): Doc =
-    new Doc({
-      case (indent, width) =>
-        cont =>
-          done((position: Position, dq: Dq) =>
-            done((remain: Remaining) =>
-              for {
-                cont1 <- f(width - remain)((indent, width))(cont)
-                out <- cont1(position, dq)
-                bp <- out(remain)
-              } yield bp
-            )
+    new Doc({ case (indent, width) =>
+      cont =>
+        done((position: Position, dq: Dq) =>
+          done((remain: Remaining) =>
+            for {
+              cont1 <- f(width - remain)((indent, width))(cont)
+              out <- cont1(position, dq)
+              bp <- out(remain)
+            } yield bp
           )
+        )
     })
 
   def nesting(f: Int => Doc): Doc = new Doc({ case iw @ (i, _) => f(i)(iw) })
