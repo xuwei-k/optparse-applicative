@@ -92,9 +92,8 @@ object Chunk {
     table match {
       case Nil => Chunk.empty
       case xs =>
-        Applicative[Chunk].pure(xs.map {
-          case (k, v) =>
-            Doc.indent(2, Doc.fillBreak(size, k).withSpace(v))
+        Applicative[Chunk].pure(xs.map { case (k, v) =>
+          Doc.indent(2, Doc.fillBreak(size, k).withSpace(v))
         }.reduce(_.withLine(_)))
     }
 }
