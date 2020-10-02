@@ -141,10 +141,14 @@ lazy val optparseApplicative = crossProject(JVMPlatform, JSPlatform, NativePlatf
     crossScalaVersions := Seq(Scala211)
   )
   .jsSettings(
-    scalacOptions += {
+    scalacOptions ++= {
       val a = (baseDirectory in LocalRootProject).value.toURI.toString
       val g = "https://raw.githubusercontent.com/xuwei-k/optparse-applicative/" + tagOrHash.value
-      s"-P:scalajs:mapSourceURI:$a->$g/"
+      if (isDottyJS.value) {
+        Nil
+      } else {
+        Seq(s"-P:scalajs:mapSourceURI:$a->$g/")
+      }
     }
   )
 

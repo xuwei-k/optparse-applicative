@@ -28,6 +28,6 @@ matrix:
     script:
     - sbt scalafmtSbtCheck scalafmtCheck test:scalafmtCheck optparseApplicativeNative/test
   - name: dotty
-    script: sbt scalafmtSbtCheck scalafmtCheck test:scalafmtCheck SetDottyNightlyVersion optparseApplicativeJVM/test
+    script: sbt scalafmtSbtCheck scalafmtCheck test:scalafmtCheck SetDottyNightlyVersion optparseApplicativeJVM/test optparseApplicativeJS/test
   allow_failures:
     - name: dotty
