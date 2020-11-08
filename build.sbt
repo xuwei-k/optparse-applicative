@@ -4,6 +4,7 @@ import ReleaseStateTransformations._
 val Scala211 = "2.11.12"
 val Scala212 = "2.12.12"
 val Scala213 = "2.13.3"
+val Scala3 = "3.0.0-M1"
 
 def gitHash(): String = sys.process.Process("git rev-parse HEAD").lineStream_!.head
 
@@ -80,7 +81,7 @@ val commonSettings = Def.settings(
     pushChanges
   ),
   scalaVersion := Scala211,
-  crossScalaVersions := List(Scala211, Scala212, Scala213),
+  crossScalaVersions := List(Scala211, Scala212, Scala213, Scala3),
   scalacOptions ++= List(
     "-feature",
     "-deprecation",
@@ -108,12 +109,16 @@ val commonSettings = Def.settings(
   },
   scalacOptions in (Compile, doc) ++= {
     val tag = tagOrHash.value
-    Seq(
-      "-sourcepath",
-      (baseDirectory in LocalRootProject).value.getAbsolutePath,
-      "-doc-source-url",
-      s"https://github.com/xuwei-k/optparse-applicative/tree/${tag}€{FILE_PATH}.scala"
-    )
+    if (isDotty.value) {
+      Nil
+    } else {
+      Seq(
+        "-sourcepath",
+        (baseDirectory in LocalRootProject).value.getAbsolutePath,
+        "-doc-source-url",
+        s"https://github.com/xuwei-k/optparse-applicative/tree/${tag}€{FILE_PATH}.scala"
+      )
+    }
   },
   libraryDependencies ++= List(
     "com.github.scalaprops" %%% "scalaprops" % scalapropsVersion.value % "test",
