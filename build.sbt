@@ -2,7 +2,7 @@ import sbtrelease._
 import ReleaseStateTransformations._
 
 val Scala211 = "2.11.12"
-val Scala212 = "2.12.12"
+val Scala212 = "2.12.13"
 val Scala213 = "2.13.4"
 val Scala3 = "3.0.0-M3"
 
@@ -30,7 +30,7 @@ def runAllIn(config: Configuration): Setting[Task[Unit]] = {
 
 val commonSettings = Def.settings(
   scalapropsCoreSettings,
-  scalapropsVersion := "0.8.1",
+  scalapropsVersion := "0.8.2",
   organization := "com.github.xuwei-k",
   description := "optparse-applicative is a Scala library for parsing options on the command line, providing a powerful applicative interface for composing these options",
   homepage := Some(url("https://github.com/xuwei-k/optparse-applicative")),
@@ -73,7 +73,7 @@ val commonSettings = Def.settings(
       },
       enableCrossBuild = true
     ),
-    releaseStepCommandAndRemaining(s"; ++ ${Scala211} ; optparseApplicativeNative/publishSigned"),
+    releaseStepCommandAndRemaining(s"+ optparseApplicativeNative/publishSigned"),
     releaseStepCommandAndRemaining("sonatypeBundleRelease"),
     setNextVersion,
     commitNextVersion,
@@ -122,14 +122,14 @@ val commonSettings = Def.settings(
   },
   libraryDependencies ++= List(
     "com.github.scalaprops" %%% "scalaprops" % scalapropsVersion.value % "test",
-    "org.scalaz" %%% "scalaz-core" % "7.3.2"
+    "org.scalaz" %%% "scalaz-core" % "7.3.3"
   ).map(_ withDottyCompat scalaVersion.value),
   libraryDependencies ++= {
     if (isDotty.value) {
       Nil
     } else {
       Seq(
-        compilerPlugin("org.typelevel" % "kind-projector" % "0.11.1" cross CrossVersion.full)
+        compilerPlugin("org.typelevel" % "kind-projector" % "0.11.3" cross CrossVersion.full)
       )
     }
   }
@@ -143,7 +143,7 @@ lazy val optparseApplicative = crossProject(JVMPlatform, JSPlatform, NativePlatf
   )
   .nativeSettings(
     scalapropsNativeSettings,
-    crossScalaVersions := Seq(Scala211)
+    crossScalaVersions := List(Scala211, Scala212, Scala213)
   )
   .jsSettings(
     scalacOptions ++= {

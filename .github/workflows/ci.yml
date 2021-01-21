@@ -21,7 +21,6 @@ jobs:
       with:
         java-version: "adopt@1.8"
     - uses: coursier/cache-action@v5
-    - run: if [[ "${{ matrix.name }}" == "native" ]] ; then ./.github/scala-native-setup.sh ; fi
     - run: |
         case ${{ matrix.name }} in
           "jvm")
@@ -42,8 +41,7 @@ jobs:
             sbt -v \
             scalafmtSbtCheck \
             scalafmtCheckAll \
-            "++ 2.11.12!" \
-            optparseApplicativeNative/test
+            "+optparseApplicativeNative/test"
             ;;
           *)
             echo "unknown job-name"
