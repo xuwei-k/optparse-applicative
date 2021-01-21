@@ -12,16 +12,41 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - args: '"+optparseApplicativeJVM/test" "+example/compile:runAll" "+publishLocal"'
-          - args: '"+optparseApplicativeJS/test"'
-          - args: '"++ 2.11.12!" optparseApplicativeNative/test'
-            name: scala-native
+          - name: jvm
+          - name: js
+          - name: native
     steps:
     - uses: actions/checkout@v2.3.4
     - uses: olafurpg/setup-scala@v10
       with:
         java-version: "adopt@1.8"
     - uses: coursier/cache-action@v5
-    - run: if [[ "${{ matrix.name }}" == "scala-native" ]] ; then ./.github/scala-native-setup.sh ; fi
-    - run: sbt -v scalafmtSbtCheck scalafmtCheckAll ${{ matrix.args }}
+    - run: if [[ "${{ matrix.name }}" == "native" ]] ; then ./.github/scala-native-setup.sh ; fi
+    - run: |
+        case ${{ matrix.name }} in
+          "jvm")
+            sbt -v \
+            scalafmtSbtCheck \
+            scalafmtCheckAll \
+            "+optparseApplicativeJVM/test" \
+            "+example/compile:runAll" \
+            "+publishLocal"
+            ;;
+          "js")
+            sbt -v \
+            scalafmtSbtCheck \
+            scalafmtCheckAll \
+            "+optparseApplicativeJS/test"
+            ;;
+          "native")
+            sbt -v \
+            scalafmtSbtCheck \
+            scalafmtCheckAll \
+            "++ 2.11.12!" \
+            optparseApplicativeNative/test
+            ;;
+          *)
+            echo "unknown job-name"
+            exit 1
+        esac
     - run: rm -rf ~/.ivy2/local
