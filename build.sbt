@@ -9,7 +9,7 @@ val Scala3 = "3.0.0-RC1"
 def gitHash(): String = sys.process.Process("git rev-parse HEAD").lineStream_!.head
 
 val tagName = Def.setting {
-  s"v${if (releaseUseGlobalVersion.value) (version in ThisBuild).value
+  s"v${if (releaseUseGlobalVersion.value) (ThisBuild / version).value
   else version.value}"
 }
 val tagOrHash = Def.setting {
@@ -19,10 +19,10 @@ val tagOrHash = Def.setting {
 val runAll = TaskKey[Unit]("runAll")
 
 def runAllIn(config: Configuration): Setting[Task[Unit]] = {
-  runAll in config := {
-    val classes = (discoveredMainClasses in config).value
-    val runner0 = (runner in run).value
-    val cp = (fullClasspath in config).value
+  (config / runAll) := {
+    val classes = (config / discoveredMainClasses).value
+    val runner0 = (run / runner).value
+    val cp = (config / fullClasspath).value
     val s = streams.value
     classes.foreach(c => runner0.run(c, Attributed.data(cp), Seq(), s.log))
   }
@@ -69,7 +69,7 @@ val commonSettings = Def.settings(
     ReleaseStep(
       action = { state =>
         val extracted = Project extract state
-        extracted.runAggregated(PgpKeys.publishSigned in Global in extracted.get(thisProjectRef), state)
+        extracted.runAggregated(extracted.get(thisProjectRef) / (Global / PgpKeys.publishSigned), state)
       },
       enableCrossBuild = true
     ),
@@ -107,14 +107,14 @@ val commonSettings = Def.settings(
         Nil
     }
   },
-  scalacOptions in (Compile, doc) ++= {
+  (Compile / doc / scalacOptions) ++= {
     val tag = tagOrHash.value
     if (isDotty.value) {
       Nil
     } else {
       Seq(
         "-sourcepath",
-        (baseDirectory in LocalRootProject).value.getAbsolutePath,
+        (LocalRootProject / baseDirectory).value.getAbsolutePath,
         "-doc-source-url",
         s"https://github.com/xuwei-k/optparse-applicative/tree/${tag}€{FILE_PATH}.scala"
       )
@@ -147,7 +147,7 @@ lazy val optparseApplicative = crossProject(JVMPlatform, JSPlatform, NativePlatf
   )
   .jsSettings(
     scalacOptions ++= {
-      val a = (baseDirectory in LocalRootProject).value.toURI.toString
+      val a = (LocalRootProject / baseDirectory).value.toURI.toString
       val g = "https://raw.githubusercontent.com/xuwei-k/optparse-applicative/" + tagOrHash.value
       val key = CrossVersion.partialVersion(scalaVersion.value) match {
         case Some((3, _)) =>
