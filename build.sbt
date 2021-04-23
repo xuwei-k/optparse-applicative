@@ -6,6 +6,10 @@ val Scala212 = "2.12.13"
 val Scala213 = "2.13.5"
 val Scala3 = "3.0.0-RC3"
 
+val isScala3 = Def.setting(
+  CrossVersion.partialVersion(scalaVersion.value).exists(_._1 == 3)
+)
+
 def gitHash(): String = sys.process.Process("git rev-parse HEAD").lineStream_!.head
 
 val tagName = Def.setting {
@@ -37,9 +41,6 @@ val commonSettings = Def.settings(
   licenses := Seq(
     "BSD-3-Clause" -> url(s"https://raw.githubusercontent.com/xuwei-k/optparse-applicative/${tagOrHash.value}/LICENSE")
   ),
-  commands += Command.command("SetDottyNightlyVersion") {
-    s"""++ ${dottyLatestNightlyBuild.get}!""" :: _
-  },
   pomExtra := {
     <developers>
       <developer>
@@ -89,7 +90,7 @@ val commonSettings = Def.settings(
     "-language:existentials,higherKinds,implicitConversions"
   ),
   scalacOptions ++= {
-    if (isDotty.value) {
+    if (isScala3.value) {
       Seq(
         "-Ykind-projector"
       )
@@ -109,7 +110,7 @@ val commonSettings = Def.settings(
   },
   (Compile / doc / scalacOptions) ++= {
     val tag = tagOrHash.value
-    if (isDotty.value) {
+    if (isScala3.value) {
       Nil
     } else {
       Seq(
@@ -123,9 +124,9 @@ val commonSettings = Def.settings(
   libraryDependencies ++= List(
     "com.github.scalaprops" %%% "scalaprops" % scalapropsVersion.value % "test",
     "org.scalaz" %%% "scalaz-core" % "7.3.3"
-  ).map(_ withDottyCompat scalaVersion.value),
+  ).map(_ cross CrossVersion.for3Use2_13),
   libraryDependencies ++= {
-    if (isDotty.value) {
+    if (isScala3.value) {
       Nil
     } else {
       Seq(
