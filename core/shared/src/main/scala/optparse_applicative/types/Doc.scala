@@ -10,7 +10,7 @@ import Trampoline.{delay, done, suspend}
 //Additional combinators adapted from PPrint haskell lib.
 //This is *insanely* ugly encoded in Scala, even the paper was hard to read. I'm very sorry.
 object Doc {
-  //Type aliases to try and give meaning to all the Ints and Functions
+  // Type aliases to try and give meaning to all the Ints and Functions
   type Indent = Int
   type Width = Int
   type Layout = String
@@ -30,7 +30,7 @@ object Doc {
     def append(f1: Doc, f2: => Doc): Doc = Doc.append(f1, f2)
   }
 
-  //helpers for pruning, scanning, writing, etc
+  // helpers for pruning, scanning, writing, etc
   def output(o: Out, r: Remaining, s: String): Free.Trampoline[String] = suspend(o(r).map(s ++ _))
 
   def scan(lengthOfText: Width, outGroup: OutGroup)(cont: TreeCont): Free.Trampoline[TreeCont] =
@@ -46,10 +46,10 @@ object Doc {
                   out3 <- group(h)(out2)
                 } yield out3)
           )
-          //Add the obligation to the end and see if we can prune
+          // Add the obligation to the end and see if we can prune
           prune(cont)(p + lengthOfText, dq.init :+ obligation)
         case None =>
-          //No choice but to print and move forward
+          // No choice but to print and move forward
           suspend(for {
             out1 <- cont(p + lengthOfText, Queue.empty)
             out2 <- outGroup(false)(out1)
@@ -112,7 +112,7 @@ object Doc {
         cont(p, dq.init.init :+ obligation)
       }
 
-  //Primatives for providing an instance for Doc.
+  // Primatives for providing an instance for Doc.
   def append(d1: Doc, d2: Doc): Doc =
     new Doc(iw =>
       cont1 =>
@@ -127,7 +127,7 @@ object Doc {
       cont1 => {
         suspend(d(iw)(leave(cont1)).map { cont2 => (pos: Position, dq: Dq) =>
           {
-            //obligation to write
+            // obligation to write
             val obligation = (_: Horizontal) => (o: Out) => done(o)
             cont2(pos, dq :+ ((pos, obligation)))
           }
@@ -178,7 +178,7 @@ object Doc {
 
   def nesting(f: Int => Doc): Doc = new Doc({ case iw @ (i, _) => f(i)(iw) })
 
-  //Derived combinators
+  // Derived combinators
 
   def hang(d: Doc, i: Indent): Doc = align(nest(i, d))
 
@@ -195,7 +195,7 @@ object Doc {
         if (w > requestedWidth) {
           nest(requestedWidth, line)
         } else {
-          //Insert the right amount of spaces
+          // Insert the right amount of spaces
           spaces(requestedWidth - w)
         }
       }
@@ -219,14 +219,14 @@ object Doc {
 
   def align(d: Doc): Doc = column(current => nesting(indent => nest(current - indent, d)))
 
-  //Fold up the docs using f, empty if it's Nil.
+  // Fold up the docs using f, empty if it's Nil.
   def foldDoc(docs: Seq[Doc])(f: (Doc, Doc) => Doc): Doc =
     docs match {
       case Nil => Empty
       case docs => docs.reduceLeft(f)
     }
 
-  //Separate the docs by a space.
+  // Separate the docs by a space.
   def hsep(docs: List[Doc]): Doc = foldDoc(docs.intersperse(space))(append(_, _))
 
   def spaces(n: Int): Doc =
