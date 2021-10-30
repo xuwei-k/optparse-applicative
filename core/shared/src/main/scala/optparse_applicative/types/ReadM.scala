@@ -37,6 +37,6 @@ object ReadM {
 
       def plus[A](a: ReadM[A], b: => ReadM[A]): ReadM[A] =
         mkReadM(s => Plus[\/[ParseError, *]].plus(a.run.run(s), b.run.run(s)))
-      //a.run.fold(_ => b, a => a.point[ReadM])
+      // a.run.fold(_ => b, a => a.point[ReadM])
     }
 }
