@@ -28,7 +28,6 @@ jobs:
             scalafmtSbtCheck \
             "+scalafmtCheckAll" \
             "+optparseApplicativeJVM/test" \
-            "+example/compile:runAll" \
             "+publishLocal"
             ;;
           "js")
