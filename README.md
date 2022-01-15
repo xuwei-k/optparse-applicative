@@ -1,7 +1,7 @@
 scala-optparse-applicative
 ==========================
 
-[![javadoc](https://javadoc-badge.appspot.com/com.github.xuwei-k/optparse-applicative_2.12.svg?label=scaladoc)](https://javadoc-badge.appspot.com/com.github.xuwei-k/optparse-applicative_2.12/optparse_applicative/index.html?javadocio=true)
+[![scaladoc](https://javadoc.io/badge2/com.github.xuwei-k/optparse-applicative_2.13/javadoc.svg)](https://javadoc.io/doc/com.github.xuwei-k/optparse-applicative_2.13/latest/optparse_applicative/index.html)
 
 A port of the [optparse-applicative][1] library to the Scala programming language.
 
