@@ -123,7 +123,7 @@ val commonSettings = Def.settings(
   },
   libraryDependencies ++= List(
     "com.github.scalaprops" %%% "scalaprops" % scalapropsVersion.value % "test",
-    "org.scalaz" %%% "scalaz-core" % "7.3.6" cross CrossVersion.for3Use2_13
+    "org.scalaz" %%% "scalaz-core" % "7.3.6"
   ),
   libraryDependencies ++= {
     if (isScala3.value) {
