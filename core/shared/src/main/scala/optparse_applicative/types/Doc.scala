@@ -87,7 +87,7 @@ object Doc {
     (p: Position, dq: Dq) =>
       if (dq.isEmpty) {
         cont(p, Queue.empty)
-      } else if (dq.length == 1) {
+      } else if (dq.lengthCompare(1) == 0) {
         val (s1, group1) = dq.last
         suspend(for {
           out1 <- cont(p, Queue.empty)
