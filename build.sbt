@@ -13,8 +13,10 @@ val isScala3 = Def.setting(
 def gitHash(): String = sys.process.Process("git rev-parse HEAD").lineStream_!.head
 
 val tagName = Def.setting {
-  s"v${if (releaseUseGlobalVersion.value) (ThisBuild / version).value
-  else version.value}"
+  s"v${
+      if (releaseUseGlobalVersion.value) (ThisBuild / version).value
+      else version.value
+    }"
 }
 val tagOrHash = Def.setting {
   if (isSnapshot.value) gitHash() else tagName.value
