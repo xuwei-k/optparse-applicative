@@ -143,8 +143,7 @@ lazy val optparseApplicative = crossProject(JVMPlatform, JSPlatform, NativePlatf
     name := UpdateReadme.optparseApplicativeName
   )
   .nativeSettings(
-    scalapropsNativeSettings,
-    crossScalaVersions := List(Scala211, Scala212, Scala213)
+    scalapropsNativeSettings
   )
   .jsSettings(
     scalacOptions ++= {
