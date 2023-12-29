@@ -95,6 +95,8 @@ val commonSettings = Def.settings(
       )
     } else {
       Seq(
+        "-Xsource:3",
+        "-Wconf:msg=package object inheritance is deprecated:warning", // TODO
         "-Xlint"
       )
     }
