@@ -294,5 +294,5 @@ private[optparse_applicative] trait Common {
     runParserFully(getPolicy(i), i.parser, args)
 
   def runParserFully[F[_]: MonadP, A](policy: ArgPolicy, p: Parser[A], args: Args): F[A] =
-    for ((Nil, r) <- runParser(policy, p, args)) yield r
+    for (case (Nil, r) <- runParser(policy, p, args)) yield r
 }
