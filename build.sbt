@@ -3,7 +3,7 @@ import ReleaseStateTransformations._
 
 val Scala212 = "2.12.19"
 val Scala213 = "2.13.13"
-val Scala3 = "3.3.2"
+val Scala3 = "3.3.3"
 
 val isScala3 = Def.setting(
   CrossVersion.partialVersion(scalaVersion.value).exists(_._1 == 3)
