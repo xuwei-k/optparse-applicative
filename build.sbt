@@ -73,7 +73,6 @@ val commonSettings = Def.settings(
       },
       enableCrossBuild = true
     ),
-    releaseStepCommandAndRemaining(s"+ optparseApplicativeNative/publishSigned"),
     releaseStepCommandAndRemaining("sonatypeBundleRelease"),
     setNextVersion,
     commitNextVersion,
@@ -183,15 +182,5 @@ val example = project
     jvm
   )
 
-lazy val root = project
-  .in(file("."))
-  .settings(
-    commonSettings,
-    noPublish
-  )
-  .aggregate(
-    // ignore native on purpose
-    jvm,
-    js,
-    example
-  )
+commonSettings
+noPublish
