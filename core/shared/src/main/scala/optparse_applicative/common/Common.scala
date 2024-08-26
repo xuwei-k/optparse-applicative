@@ -249,7 +249,7 @@ private[optparse_applicative] trait Common {
       case AllowOpts =>
         val p1: NondetT[ArgsState[F]#G, Parser[A]] = searchArg[F, A](arg, p)
         val ev = NondetT.nondetTMonadPlus[ArgsState[F]#G]
-        val w = parseWord(arg).orEmpty[NondetT[ArgsState[F]#G, *]](ev, ev)
+        val w = parseWord(arg).orEmpty[NondetT[ArgsState[F]#G, *]](using ev, ev)
         val p2 = w.flatMap(searchOpt[F, A](pprefs, _, p))
         p1 orElse p2
     }
