@@ -54,7 +54,7 @@ val commonSettings = Def.settings(
       <tag>{tagOrHash.value}</tag>
     </scm>
   },
-  publishTo := sonatypePublishToBundle.value,
+  publishTo := (if (isSnapshot.value) None else localStaging.value),
   releaseTagName := tagName.value,
   releaseCrossBuild := true,
   releaseProcess := Seq[ReleaseStep](
@@ -73,7 +73,7 @@ val commonSettings = Def.settings(
       },
       enableCrossBuild = true
     ),
-    releaseStepCommandAndRemaining("sonatypeBundleRelease"),
+    releaseStepCommandAndRemaining("sonaRelease"),
     setNextVersion,
     commitNextVersion,
     UpdateReadme.updateReadmeProcess,
