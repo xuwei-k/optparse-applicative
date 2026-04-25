@@ -11,7 +11,7 @@ val isScala3 = Def.setting(
   CrossVersion.partialVersion(scalaVersion.value).exists(_._1 == 3)
 )
 
-def gitHash(): String = sys.process.Process("git rev-parse HEAD").lineStream_!.head
+def gitHash(): String = sys.process.Process("git rev-parse HEAD").lazyLines_!.head
 
 val tagName = Def.setting {
   s"v${if (releaseUseGlobalVersion.value) (ThisBuild / version).value
@@ -21,13 +21,14 @@ val tagOrHash = Def.setting {
   if (isSnapshot.value) gitHash() else tagName.value
 }
 
-val runAll = TaskKey[Unit]("runAll")
+@transient
+val runAll = taskKey[Unit]("")
 
 def runAllIn(config: Configuration): Setting[Task[Unit]] = {
   (config / runAll) := {
     val classes = (config / discoveredMainClasses).value
     val runner0 = (run / runner).value
-    val cp = (config / fullClasspath).value
+    val cp = (config / fullClasspath).value.map(x => Attributed.blank(fileConverter.value.toPath(x.data)))
     val s = streams.value
     classes.foreach(c => runner0.run(c, Attributed.data(cp), Seq(), s.log))
   }
@@ -125,15 +126,15 @@ val commonSettings = Def.settings(
     }
   },
   libraryDependencies ++= List(
-    "com.github.scalaprops" %%% "scalaprops" % scalapropsVersion.value % "test",
-    "org.scalaz" %%% "scalaz-core" % "7.3.9"
+    "com.github.scalaprops" %% "scalaprops" % scalapropsVersion.value % "test",
+    "org.scalaz" %% "scalaz-core" % "7.3.9"
   ),
   libraryDependencies ++= {
     if (isScala3.value) {
       Nil
     } else {
       Seq(
-        compilerPlugin("org.typelevel" % "kind-projector" % "0.13.4" cross CrossVersion.full)
+        compilerPlugin(("org.typelevel" % "kind-projector" % "0.13.4").cross(CrossVersion.full))
       )
     }
   }
@@ -210,17 +211,18 @@ val example = projectMatrix
     optparseApplicative
   )
 
-commonSettings
-noPublish
-
-TaskKey[Unit]("testSequential") := Def
-  .sequential(
-    (optparseApplicative.projectRefs ++ example.projectRefs).map { x =>
-      Def.sequential(
-        Def.task(streams.value.log.info(s"start ${(x / thisProject).value.id} test")),
-        x / Test / test,
-        Def.task(streams.value.log.info(s"end ${(x / thisProject).value.id} test"))
-      )
-    }
-  )
-  .value
+val optparseApplicativeRoot = rootProject.autoAggregate.settings(
+  commonSettings,
+  noPublish,
+  TaskKey[Unit]("testSequential") := Def
+    .sequential(
+      (optparseApplicative.projectRefs ++ example.projectRefs).map { x =>
+        Def.sequential(
+          Def.task(streams.value.log.info(s"start ${(x / thisProject).value.id} test")),
+          x / Test / testFull,
+          Def.task(streams.value.log.info(s"end ${(x / thisProject).value.id} test"))
+        )
+      }
+    )
+    .value
+)
