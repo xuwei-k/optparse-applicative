@@ -85,7 +85,7 @@ val commonSettings = Def.settings(
     "-feature",
     "-deprecation",
     "-unchecked",
-    "-language:existentials,higherKinds,implicitConversions"
+    "-language:existentials,implicitConversions"
   ),
   scalacOptions ++= {
     if (isScala3.value) {
@@ -101,9 +101,13 @@ val commonSettings = Def.settings(
     }
   },
   scalacOptions ++= {
-    CrossVersion.partialVersion(scalaVersion.value) match {
-      case Some((2, v)) if v <= 12 =>
-        Seq("-Xfuture", "-Ypartial-unification")
+    scalaBinaryVersion.value match {
+      case "2.12" =>
+        Seq(
+          "-Xfuture",
+          "-Ypartial-unification",
+          "-language:higherKinds"
+        )
       case _ =>
         Nil
     }
