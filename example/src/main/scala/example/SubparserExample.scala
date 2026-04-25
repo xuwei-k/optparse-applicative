@@ -16,10 +16,10 @@ object SubparserExample {
       strOption(long("globalOpt"), help("Option that applies to all commands")),
       switch(long("globalFlag"), help("Switch that applies to all commands")),
       subparser[Command](
-        command("add", info(many(strArgument(metavar("PATH"))).map(Add))),
-        command("commit", info(strArgument(metavar("MESSAGE")).map(Commit)))
+        command("add", info(many(strArgument(metavar("PATH"))).map(Add.apply))),
+        command("commit", info(strArgument(metavar("MESSAGE")).map(Commit.apply)))
       )
-    )(Options)
+    )(Options.apply)
 
   def main(args: Array[String]): Unit = {
     val opts = info(parseOpts <*> helper, progDesc("A program with some global opts and command subparsers"))

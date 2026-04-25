@@ -30,7 +30,7 @@ object ValidationExample {
   val username: ParserV[String] = strOption(short('u'), long("username")).map(validUsername)
   val email: ParserV[String] = strOption(short('e'), long("email")).map(validEmail)
 
-  val userData: ParserV[UserData] = ^(username, email)(UserData)
+  val userData: ParserV[UserData] = ^(username, email)(UserData.apply)
 
   def main(args: Array[String]): Unit = {
     val validatedUserData = execParser(args, "ValidationExample", info(userData))
