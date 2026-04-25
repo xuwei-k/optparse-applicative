@@ -5,6 +5,8 @@ val Scala212 = "2.12.21"
 val Scala213 = "2.13.18"
 val Scala3 = "3.3.7"
 
+val scalaVersions = List(Scala212, Scala213, Scala3)
+
 val isScala3 = Def.setting(
   CrossVersion.partialVersion(scalaVersion.value).exists(_._1 == 3)
 )
@@ -79,8 +81,6 @@ val commonSettings = Def.settings(
     UpdateReadme.updateReadmeProcess,
     pushChanges
   ),
-  scalaVersion := Scala212,
-  crossScalaVersions := List(Scala212, Scala213, Scala3),
   scalacOptions ++= List(
     "-feature",
     "-deprecation",
@@ -140,34 +140,43 @@ val commonSettings = Def.settings(
   }
 )
 
-lazy val optparseApplicative = crossProject(JVMPlatform, JSPlatform, NativePlatform)
+lazy val optparseApplicative = projectMatrix
   .in(file("core"))
+  .defaultAxes()
   .settings(
     commonSettings,
     name := UpdateReadme.optparseApplicativeName
   )
-  .nativeSettings(
-    scalapropsNativeSettings
+  .jvmPlatform(
+    scalaVersions,
+    Def.settings(
+    )
   )
-  .jsSettings(
-    scalacOptions ++= {
-      val a = (LocalRootProject / baseDirectory).value.toURI.toString
-      val g = "https://raw.githubusercontent.com/xuwei-k/optparse-applicative/" + tagOrHash.value
-      val key = CrossVersion.partialVersion(scalaVersion.value) match {
-        case Some((3, _)) =>
-          "-scalajs-mapSourceURI"
-        case _ =>
-          "-P:scalajs:mapSourceURI"
+  .nativePlatform(
+    scalaVersions,
+    Def.settings(
+      scalapropsNativeSettings
+    )
+  )
+  .jsPlatform(
+    scalaVersions,
+    Def.settings(
+      scalacOptions ++= {
+        val a = (LocalRootProject / baseDirectory).value.toURI.toString
+        val g = "https://raw.githubusercontent.com/xuwei-k/optparse-applicative/" + tagOrHash.value
+        val key = CrossVersion.partialVersion(scalaVersion.value) match {
+          case Some((3, _)) =>
+            "-scalajs-mapSourceURI"
+          case _ =>
+            "-P:scalajs:mapSourceURI"
+        }
+        Seq(s"${key}:$a->$g/")
       }
-      Seq(s"${key}:$a->$g/")
-    }
+    )
   )
-
-val jvm = optparseApplicative.jvm
-val js = optparseApplicative.js
-val native = optparseApplicative.native
 
 val noPublish = Seq(
+  autoScalaLibrary := false,
   publish := {},
   publishLocal := {},
   PgpKeys.publishSigned := {},
@@ -175,16 +184,34 @@ val noPublish = Seq(
   publishArtifact := false
 )
 
-val example = project
+val example = projectMatrix
   .in(file("example"))
+  .defaultAxes()
+  .jvmPlatform(
+    scalaVersions,
+    Def.settings(
+    )
+  )
   .settings(
     commonSettings,
     runAllIn(Compile),
     noPublish
   )
   .dependsOn(
-    jvm
+    optparseApplicative
   )
 
 commonSettings
 noPublish
+
+TaskKey[Unit]("testSequential") := Def
+  .sequential(
+    (optparseApplicative.projectRefs ++ example.projectRefs).map { x =>
+      Def.sequential(
+        Def.task(streams.value.log.info(s"start ${(x / thisProject).value.id} test")),
+        x / Test / test,
+        Def.task(streams.value.log.info(s"end ${(x / thisProject).value.id} test"))
+      )
+    }
+  )
+  .value
