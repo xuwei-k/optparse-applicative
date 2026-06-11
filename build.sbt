@@ -58,7 +58,6 @@ val commonSettings = Def.settings(
   },
   publishTo := (if (isSnapshot.value) None else localStaging.value),
   releaseTagName := tagName.value,
-  releaseCrossBuild := true,
   releaseProcess := Seq[ReleaseStep](
     checkSnapshotDependencies,
     inquireVersions,
