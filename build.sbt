@@ -39,9 +39,9 @@ val commonSettings = Def.settings(
   scalapropsVersion := "0.11.1",
   organization := "com.github.xuwei-k",
   description := "optparse-applicative is a Scala library for parsing options on the command line, providing a powerful applicative interface for composing these options",
-  homepage := Some(url("https://github.com/xuwei-k/optparse-applicative")),
+  homepage := Some(uri("https://github.com/xuwei-k/optparse-applicative")),
   licenses := Seq(
-    "BSD-3-Clause" -> url(s"https://raw.githubusercontent.com/xuwei-k/optparse-applicative/${tagOrHash.value}/LICENSE")
+    "BSD-3-Clause" -> uri(s"https://raw.githubusercontent.com/xuwei-k/optparse-applicative/${tagOrHash.value}/LICENSE")
   ),
   pomExtra := {
     <developers>
