@@ -14,7 +14,7 @@ class ParserSpec extends Scalaprops {
   def run[A](pinfo: ParserInfo[A], args: List[String]): ParserResult[A] =
     execParserPure(prefs(), pinfo, args)
 
-  val `dash-dash args` = forAll {
+  property("dash-dash args") = forAll {
     val result = run(Commands.opts, List("hello", "foo", "--", "--bar", "--", "baz"))
     result match {
       case Success(Hello(List("foo", "--bar", "--", "baz"))) => true
@@ -25,12 +25,12 @@ class ParserSpec extends Scalaprops {
   val flags: Parser[Int] =
     flag_(1, long("foo")) <|> flag_(2, long("bar")) <|> flag_(3, long("baz"))
 
-  val `test disambiguate` = forAll {
+  property(" disambiguate") = forAll {
     val result = execParserPure(prefs(disambiguate), info(flags), List("--f"))
     result == Success(1)
   }
 
-  val ambiguous = forAll {
+  property("ambiguous") = forAll {
     val result = execParserPure(prefs(disambiguate), info(flags), List("--ba"))
     result match {
       case Success(_) => false
@@ -38,7 +38,7 @@ class ParserSpec extends Scalaprops {
     }
   }
 
-  val backtracking = forAll {
+  property("backtracking") = forAll {
     val p2 = switch(short('a'))
     val p1 = ^(subparser(command("c", info(p2))), switch(short('b')))((_, _))
     val i = info(p1 <*> helper)

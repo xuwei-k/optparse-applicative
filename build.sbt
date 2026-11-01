@@ -165,7 +165,6 @@ lazy val optparseApplicative = projectMatrix
   .nativePlatform(
     scalaVersions,
     Def.settings(
-      scalapropsNativeSettings
     )
   )
   .jsPlatform(
